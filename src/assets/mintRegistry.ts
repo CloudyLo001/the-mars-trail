@@ -40,15 +40,25 @@ interface Registry {
 const registry = registryJson as unknown as Registry;
 
 /**
+ * Deployment base path, with the trailing slash removed.
+ *
+ * On GitHub Pages the site lives under `/<repo>/`, not the domain root, so a
+ * hard-coded `/assets/...` would 404 for every model, portrait, and sound.
+ * Vite injects the configured base here, which is `/` in dev and locally.
+ */
+const BASE_PATH = (import.meta.env.BASE_URL ?? '/').replace(/\/+$/, '');
+
+/**
  * Convert a registry filesystem path into a browser URL. Vite serves `public/`
- * from the site root, so the prefix is stripped rather than kept.
+ * from the site root, so that prefix is stripped and the deployment base is
+ * applied in its place.
  */
 function toBrowserUrl(localPath: string | undefined): string | null {
   if (!localPath) return null;
   const normalized = localPath.replace(/\\/g, '/');
   const publicIndex = normalized.indexOf('public/');
-  const relative = publicIndex >= 0 ? normalized.slice(publicIndex + 'public'.length) : normalized;
-  return relative.startsWith('/') ? relative : `/${relative}`;
+  const relative = publicIndex >= 0 ? normalized.slice(publicIndex + 'public/'.length) : normalized;
+  return `${BASE_PATH}/${relative.replace(/^\/+/, '')}`;
 }
 
 export function hasAsset(key: string): boolean {

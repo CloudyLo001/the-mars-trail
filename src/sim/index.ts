@@ -71,6 +71,8 @@ export { hazardOptions, effectiveSeverity } from './hazards';
 export type { HazardOption, HazardOptionId, HazardResolution } from './hazards';
 export type { ScoreReport, ScoreLine } from './score';
 export type { StationService, CampOption, HarvestResult } from './stations';
+export { autoplay } from './autoplay';
+export type { AutoplayStyle, AutoplayResult } from './autoplay';
 
 export type SimListener = (state: GameState) => void;
 

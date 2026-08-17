@@ -110,13 +110,34 @@ export function scoreRun(state: GameState): ScoreReport {
     subtotal,
     multiplier,
     total,
-    rating: ratingFor(total, arrived),
+    rating: ratingFor(total, arrived, state),
     outcomeHeadline: headlineFor(state),
   };
 }
 
-function ratingFor(total: number, arrived: boolean): string {
-  if (!arrived) return 'Lost With All Hands';
+/**
+ * The rating has to describe the actual ending, not just success or failure.
+ * Going adrift or missing the window usually leaves the crew alive and well —
+ * reporting that as "Lost With All Hands" is simply untrue, and it is the most
+ * common way to lose.
+ */
+function ratingFor(total: number, arrived: boolean, state: GameState): string {
+  if (!arrived) {
+    const survivors = livingCrew(state).length;
+    if (survivors === 0) return 'Lost With All Hands';
+    switch (state.outcome) {
+      case 'adrift':
+        return survivors === state.crew.length
+          ? 'Adrift With A Living Crew'
+          : `Adrift — ${survivors} Still Aboard`;
+      case 'window-closed':
+        return survivors === state.crew.length
+          ? 'Marooned In Transit'
+          : `Marooned — ${survivors} Still Aboard`;
+      default:
+        return `Lost — ${survivors} Still Aboard`;
+    }
+  }
   if (total >= 6000) return 'Colony Founder';
   if (total >= 4200) return 'Master Of The Crossing';
   if (total >= 2800) return 'Veteran Captain';

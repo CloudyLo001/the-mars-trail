@@ -67,6 +67,14 @@ interface ThreeGameTestHooks {
   setPhosphor(enabled: boolean): void;
   /** Set the pixelation buffer height, for display-settings checks. */
   setInternalHeight(height: number): void;
+  /**
+   * Play a complete run under a named policy and stop on the score screen.
+   * Styles: 'careful' | 'reckless' | 'starve' | 'dawdle'.
+   */
+  playToEnd(
+    style: string,
+    seed: number,
+  ): { outcome: string; steps: number; day: number; leg: number; survivors: number };
 }
 
 interface Window {

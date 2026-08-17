@@ -1,0 +1,67 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  # Allows a redeploy from the Actions tab without pushing a commit.
+  workflow_dispatch:
+
+# Pages deployment needs these; the default GITHUB_TOKEN grants nothing extra.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let a running deploy finish rather than cancelling it mid-publish, but keep
+# only one queued behind it.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Vite 8 requires 20.19+ or 22.12+.
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck and build
+        env:
+          # Project pages live under /<repo>/. Derived from the repository name
+          # so a rename or a fork does not silently produce a broken base path.
+          VITE_BASE: /${{ github.event.repository.name }}/
+        run: npm run build
+
+      - name: Verify the build references the deployment base
+        env:
+          BASE: /${{ github.event.repository.name }}/
+        run: |
+          if ! grep -q "$BASE" dist/index.html; then
+            echo "dist/index.html does not reference $BASE — asset URLs would 404."
+            exit 1
+          fi
+          echo "Base path OK: $BASE"
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

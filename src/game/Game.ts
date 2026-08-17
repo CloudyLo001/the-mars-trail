@@ -16,8 +16,8 @@ import { AudioSystem } from '../systems/AudioSystem';
 import { Hud } from '../ui/Hud';
 import { Screens } from '../ui/Screens';
 import { loadSettings, saveSettings, type DisplaySettings } from '../ui/settings';
-import { MarsTrailSim, effectiveSeverity, formatDistance } from '../sim';
-import type { BurnRate, GameState, HazardOptionId, Phase, RationLevel } from '../sim';
+import { MarsTrailSim, autoplay, effectiveSeverity, formatDistance } from '../sim';
+import type { AutoplayStyle, BurnRate, GameState, HazardOptionId, Phase, RationLevel } from '../sim';
 import { createSeededRandom } from '../utils/random';
 
 /** Burn-rate to visual/audio intensity, 0-1. */
@@ -610,6 +610,21 @@ export class Game {
       setInternalHeight: (height: number) => {
         this.settings = { ...this.settings, internalHeight: height };
         this.applySettings();
+      },
+      /**
+       * Bot playtest: play a whole run under a named policy and land on the
+       * real score screen. Every step goes through the normal commands, so the
+       * ending is one a player could actually reach.
+       */
+      playToEnd: (style: string, seed: number) => {
+        this.tutorialOpen = false;
+        this.logOpen = false;
+        this.settingsOpen = false;
+        this.pendingOutcome = null;
+        const result = autoplay(this.sim, style as AutoplayStyle, seed);
+        this.syncSceneToLeg();
+        this.renderPhase(true);
+        return result;
       },
       setPhosphor: (enabled: boolean) => {
         this.settings = { ...this.settings, phosphor: enabled };
