@@ -1,0 +1,1395 @@
+{
+  "registryVersion": 1,
+  "mintProject": {
+    "projectId": "zd70a7tzytg7vrwxa409wybrm58cnynd",
+    "name": "Mars Trail Game"
+  },
+  "assetRoot": "public/assets/mint",
+  "assets": {
+    "asteroid-01": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "model",
+        "assetId": "ks7bm1may9p4mn86zf23fja4gs8cnq2q"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "original_glb": {
+          "artifactId": "original_glb",
+          "role": "canonical_model",
+          "format": "glb",
+          "contentType": "model/gltf-binary",
+          "filename": "large-carbonaceous-asteroid-gs8cnq2q-original.glb",
+          "localPath": "public/assets/mint/asteroid-01/original_glb.glb",
+          "loaderHint": "gltf",
+          "byteSize": 414100,
+          "extensionsUsed": [],
+          "extensionsRequired": [],
+          "usesDraco": false,
+          "requiresDraco": false,
+          "usesMeshopt": false,
+          "requiresMeshopt": false,
+          "usesKtx2": false,
+          "requiresKtx2": false,
+          "unknownRequiredExtensions": []
+        },
+        "preview_image": {
+          "artifactId": "preview_image",
+          "role": "preview_image",
+          "format": "webp",
+          "contentType": "image/webp",
+          "filename": "large-carbonaceous-asteroid-gs8cnq2q-preview.webp",
+          "localPath": "public/assets/mint/asteroid-01/preview_image.webp",
+          "loaderHint": "image",
+          "byteSize": 32336
+        }
+      },
+      "thumbnailUrl": "public/assets/mint/asteroid-01/preview_image.webp"
+    },
+    "asteroid-02": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "model",
+        "assetId": "ks75zwafbcrssxmxt11mffn2zx8cm68f"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "original_glb": {
+          "artifactId": "original_glb",
+          "role": "canonical_model",
+          "format": "glb",
+          "contentType": "model/gltf-binary",
+          "filename": "medium-iron-asteroid-zx8cm68f-original.glb",
+          "localPath": "public/assets/mint/asteroid-02/original_glb.glb",
+          "loaderHint": "gltf",
+          "byteSize": 831056,
+          "extensionsUsed": [],
+          "extensionsRequired": [],
+          "usesDraco": false,
+          "requiresDraco": false,
+          "usesMeshopt": false,
+          "requiresMeshopt": false,
+          "usesKtx2": false,
+          "requiresKtx2": false,
+          "unknownRequiredExtensions": []
+        },
+        "preview_image": {
+          "artifactId": "preview_image",
+          "role": "preview_image",
+          "format": "webp",
+          "contentType": "image/webp",
+          "filename": "medium-iron-asteroid-zx8cm68f-preview.webp",
+          "localPath": "public/assets/mint/asteroid-02/preview_image.webp",
+          "loaderHint": "image",
+          "byteSize": 44016
+        }
+      },
+      "thumbnailUrl": "public/assets/mint/asteroid-02/preview_image.webp"
+    },
+    "asteroid-03": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "model",
+        "assetId": "ks7cbazac29hcn54s5t7pefhv18cm6tp"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "original_glb": {
+          "artifactId": "original_glb",
+          "role": "canonical_model",
+          "format": "glb",
+          "contentType": "model/gltf-binary",
+          "filename": "small-rubble-rock-v18cm6tp-original.glb",
+          "localPath": "public/assets/mint/asteroid-03/original_glb.glb",
+          "loaderHint": "gltf",
+          "byteSize": 605444,
+          "extensionsUsed": [],
+          "extensionsRequired": [],
+          "usesDraco": false,
+          "requiresDraco": false,
+          "usesMeshopt": false,
+          "requiresMeshopt": false,
+          "usesKtx2": false,
+          "requiresKtx2": false,
+          "unknownRequiredExtensions": []
+        },
+        "preview_image": {
+          "artifactId": "preview_image",
+          "role": "preview_image",
+          "format": "webp",
+          "contentType": "image/webp",
+          "filename": "small-rubble-rock-v18cm6tp-preview.webp",
+          "localPath": "public/assets/mint/asteroid-03/preview_image.webp",
+          "loaderHint": "image",
+          "byteSize": 33300
+        }
+      },
+      "thumbnailUrl": "public/assets/mint/asteroid-03/preview_image.webp"
+    },
+    "asteroid-04": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "model",
+        "assetId": "ks7cmf8wt465628xbk2t2zps7h8cnn13"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "original_glb": {
+          "artifactId": "original_glb",
+          "role": "canonical_model",
+          "format": "glb",
+          "contentType": "model/gltf-binary",
+          "filename": "dirty-ice-fragment-7h8cnn13-original.glb",
+          "localPath": "public/assets/mint/asteroid-04/original_glb.glb",
+          "loaderHint": "gltf",
+          "byteSize": 658140,
+          "extensionsUsed": [],
+          "extensionsRequired": [],
+          "usesDraco": false,
+          "requiresDraco": false,
+          "usesMeshopt": false,
+          "requiresMeshopt": false,
+          "usesKtx2": false,
+          "requiresKtx2": false,
+          "unknownRequiredExtensions": []
+        },
+        "preview_image": {
+          "artifactId": "preview_image",
+          "role": "preview_image",
+          "format": "webp",
+          "contentType": "image/webp",
+          "filename": "dirty-ice-fragment-7h8cnn13-preview.webp",
+          "localPath": "public/assets/mint/asteroid-04/preview_image.webp",
+          "loaderHint": "image",
+          "byteSize": 47044
+        }
+      },
+      "thumbnailUrl": "public/assets/mint/asteroid-04/preview_image.webp"
+    },
+    "asteroid-05": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "model",
+        "assetId": "ks7fj27v48mcqprtcn684n2qk58cn0tm"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "original_glb": {
+          "artifactId": "original_glb",
+          "role": "canonical_model",
+          "format": "glb",
+          "contentType": "model/gltf-binary",
+          "filename": "split-boulder-k58cn0tm-original.glb",
+          "localPath": "public/assets/mint/asteroid-05/original_glb.glb",
+          "loaderHint": "gltf",
+          "byteSize": 577128,
+          "extensionsUsed": [],
+          "extensionsRequired": [],
+          "usesDraco": false,
+          "requiresDraco": false,
+          "usesMeshopt": false,
+          "requiresMeshopt": false,
+          "usesKtx2": false,
+          "requiresKtx2": false,
+          "unknownRequiredExtensions": []
+        },
+        "preview_image": {
+          "artifactId": "preview_image",
+          "role": "preview_image",
+          "format": "webp",
+          "contentType": "image/webp",
+          "filename": "split-boulder-k58cn0tm-preview.webp",
+          "localPath": "public/assets/mint/asteroid-05/preview_image.webp",
+          "loaderHint": "image",
+          "byteSize": 35546
+        }
+      },
+      "thumbnailUrl": "public/assets/mint/asteroid-05/preview_image.webp"
+    },
+    "asteroid-06": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "model",
+        "assetId": "ks71b5k41qxrcva0k31p15qhvs8cmw4r"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "original_glb": {
+          "artifactId": "original_glb",
+          "role": "canonical_model",
+          "format": "glb",
+          "contentType": "model/gltf-binary",
+          "filename": "ice-capped-rock-vs8cmw4r-original.glb",
+          "localPath": "public/assets/mint/asteroid-06/original_glb.glb",
+          "loaderHint": "gltf",
+          "byteSize": 645864,
+          "extensionsUsed": [],
+          "extensionsRequired": [],
+          "usesDraco": false,
+          "requiresDraco": false,
+          "usesMeshopt": false,
+          "requiresMeshopt": false,
+          "usesKtx2": false,
+          "requiresKtx2": false,
+          "unknownRequiredExtensions": []
+        },
+        "preview_image": {
+          "artifactId": "preview_image",
+          "role": "preview_image",
+          "format": "webp",
+          "contentType": "image/webp",
+          "filename": "ice-capped-rock-vs8cmw4r-preview.webp",
+          "localPath": "public/assets/mint/asteroid-06/preview_image.webp",
+          "loaderHint": "image",
+          "byteSize": 42426
+        }
+      },
+      "thumbnailUrl": "public/assets/mint/asteroid-06/preview_image.webp"
+    },
+    "audio-drive-hum": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "audio",
+        "assetId": "xd7e68eg3jss5ydyzn4s2bynph8cnkp3"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "audio_file": {
+          "artifactId": "audio_file",
+          "role": "audio",
+          "format": "mp3",
+          "contentType": "audio/mpeg",
+          "filename": "Drive-Hum-Loop-9a58d6.mp3",
+          "localPath": "public/assets/mint/audio-drive-hum/audio_file.mp3",
+          "loaderHint": "audio",
+          "byteSize": 321036,
+          "durationSeconds": 20
+        }
+      }
+    },
+    "audio-klaxon": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "audio",
+        "assetId": "xd7347tctr25yw7kf6j00vzypd8cnje5"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "audio_file": {
+          "artifactId": "audio_file",
+          "role": "audio",
+          "format": "mp3",
+          "contentType": "audio/mpeg",
+          "filename": "Hazard-Klaxon-1d14d0.mp3",
+          "localPath": "public/assets/mint/audio-klaxon/audio_file.mp3",
+          "loaderHint": "audio",
+          "byteSize": 33062,
+          "durationSeconds": 2
+        }
+      }
+    },
+    "crew-portrait-1": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "image",
+        "assetId": "xn73h8vxdrgqm8rppbkgd4284n8cn2rd"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "image_file": {
+          "artifactId": "image_file",
+          "role": "image",
+          "format": "png",
+          "contentType": "image/png",
+          "filename": "Crew-Portrait-Thompson-6321d2.png",
+          "localPath": "public/assets/mint/crew-portrait-1/image_file.png",
+          "loaderHint": "image",
+          "byteSize": 1171004,
+          "width": 1024,
+          "height": 1024,
+          "aspectRatio": 1
+        }
+      }
+    },
+    "crew-portrait-2": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "image",
+        "assetId": "xn7cfewah09z0s206zh7pfy9x18cm52p"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "image_file": {
+          "artifactId": "image_file",
+          "role": "image",
+          "format": "png",
+          "contentType": "image/png",
+          "filename": "Crew-Portrait-Helen-bf89be.png",
+          "localPath": "public/assets/mint/crew-portrait-2/image_file.png",
+          "loaderHint": "image",
+          "byteSize": 891836,
+          "width": 1024,
+          "height": 1024,
+          "aspectRatio": 1
+        }
+      }
+    },
+    "crew-portrait-3": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "image",
+        "assetId": "xn7ethpgjgxpvgbnz7fsz9gx2x8cm6xw"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "image_file": {
+          "artifactId": "image_file",
+          "role": "image",
+          "format": "png",
+          "contentType": "image/png",
+          "filename": "Crew-Portrait-Jane-9a20ce.png",
+          "localPath": "public/assets/mint/crew-portrait-3/image_file.png",
+          "loaderHint": "image",
+          "byteSize": 1083050,
+          "width": 1024,
+          "height": 1024,
+          "aspectRatio": 1
+        }
+      }
+    },
+    "crew-portrait-4": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "image",
+        "assetId": "xn7e1yww3v4cn8bamx557dfkm98cm5c2"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "image_file": {
+          "artifactId": "image_file",
+          "role": "image",
+          "format": "png",
+          "contentType": "image/png",
+          "filename": "Crew-Portrait-Jethro-78322a.png",
+          "localPath": "public/assets/mint/crew-portrait-4/image_file.png",
+          "loaderHint": "image",
+          "byteSize": 1059825,
+          "width": 1024,
+          "height": 1024,
+          "aspectRatio": 1
+        }
+      }
+    },
+    "crew-portrait-5": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "image",
+        "assetId": "xn786yqjthxvxntmaw2fqy1qvx8cnr77"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "image_file": {
+          "artifactId": "image_file",
+          "role": "image",
+          "format": "png",
+          "contentType": "image/png",
+          "filename": "Crew-Portrait-Steelah-6506b7.png",
+          "localPath": "public/assets/mint/crew-portrait-5/image_file.png",
+          "loaderHint": "image",
+          "byteSize": 999609,
+          "width": 1024,
+          "height": 1024,
+          "aspectRatio": 1
+        }
+      }
+    },
+    "debris-01": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "model",
+        "assetId": "ks783wrwbnqx20nh3ynjhfcg8d8cmt0d"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "original_glb": {
+          "artifactId": "original_glb",
+          "role": "canonical_model",
+          "format": "glb",
+          "contentType": "model/gltf-binary",
+          "filename": "dead-comsat-8d8cmt0d-original.glb",
+          "localPath": "public/assets/mint/debris-01/original_glb.glb",
+          "loaderHint": "gltf",
+          "byteSize": 1217736,
+          "extensionsUsed": [],
+          "extensionsRequired": [],
+          "usesDraco": false,
+          "requiresDraco": false,
+          "usesMeshopt": false,
+          "requiresMeshopt": false,
+          "usesKtx2": false,
+          "requiresKtx2": false,
+          "unknownRequiredExtensions": []
+        },
+        "preview_image": {
+          "artifactId": "preview_image",
+          "role": "preview_image",
+          "format": "webp",
+          "contentType": "image/webp",
+          "filename": "dead-comsat-8d8cmt0d-preview.webp",
+          "localPath": "public/assets/mint/debris-01/preview_image.webp",
+          "loaderHint": "image",
+          "byteSize": 88340
+        }
+      },
+      "thumbnailUrl": "public/assets/mint/debris-01/preview_image.webp"
+    },
+    "debris-02": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "model",
+        "assetId": "ks75hq31ssjns9zyvf177wkspx8cm0cv"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "original_glb": {
+          "artifactId": "original_glb",
+          "role": "canonical_model",
+          "format": "glb",
+          "contentType": "model/gltf-binary",
+          "filename": "spent-rocket-stage-px8cm0cv-original.glb",
+          "localPath": "public/assets/mint/debris-02/original_glb.glb",
+          "loaderHint": "gltf",
+          "byteSize": 1040188,
+          "extensionsUsed": [],
+          "extensionsRequired": [],
+          "usesDraco": false,
+          "requiresDraco": false,
+          "usesMeshopt": false,
+          "requiresMeshopt": false,
+          "usesKtx2": false,
+          "requiresKtx2": false,
+          "unknownRequiredExtensions": []
+        },
+        "preview_image": {
+          "artifactId": "preview_image",
+          "role": "preview_image",
+          "format": "webp",
+          "contentType": "image/webp",
+          "filename": "spent-rocket-stage-px8cm0cv-preview.webp",
+          "localPath": "public/assets/mint/debris-02/preview_image.webp",
+          "loaderHint": "image",
+          "byteSize": 55166
+        }
+      },
+      "thumbnailUrl": "public/assets/mint/debris-02/preview_image.webp"
+    },
+    "debris-03": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "model",
+        "assetId": "ks7cfkz434gqa5pva3pfgnsk2x8cnxdc"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "original_glb": {
+          "artifactId": "original_glb",
+          "role": "canonical_model",
+          "format": "glb",
+          "contentType": "model/gltf-binary",
+          "filename": "torn-solar-array-2x8cnxdc-original.glb",
+          "localPath": "public/assets/mint/debris-03/original_glb.glb",
+          "loaderHint": "gltf",
+          "byteSize": 1060816,
+          "extensionsUsed": [],
+          "extensionsRequired": [],
+          "usesDraco": false,
+          "requiresDraco": false,
+          "usesMeshopt": false,
+          "requiresMeshopt": false,
+          "usesKtx2": false,
+          "requiresKtx2": false,
+          "unknownRequiredExtensions": []
+        },
+        "preview_image": {
+          "artifactId": "preview_image",
+          "role": "preview_image",
+          "format": "webp",
+          "contentType": "image/webp",
+          "filename": "torn-solar-array-2x8cnxdc-preview.webp",
+          "localPath": "public/assets/mint/debris-03/preview_image.webp",
+          "loaderHint": "image",
+          "byteSize": 127524
+        }
+      },
+      "thumbnailUrl": "public/assets/mint/debris-03/preview_image.webp"
+    },
+    "debris-04": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "model",
+        "assetId": "ks7c0zvg2z8a5hm23tgdq5yjyh8cmz7x"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "original_glb": {
+          "artifactId": "original_glb",
+          "role": "canonical_model",
+          "format": "glb",
+          "contentType": "model/gltf-binary",
+          "filename": "tumbling-hull-section-yh8cmz7x-original.glb",
+          "localPath": "public/assets/mint/debris-04/original_glb.glb",
+          "loaderHint": "gltf",
+          "byteSize": 915316,
+          "extensionsUsed": [],
+          "extensionsRequired": [],
+          "usesDraco": false,
+          "requiresDraco": false,
+          "usesMeshopt": false,
+          "requiresMeshopt": false,
+          "usesKtx2": false,
+          "requiresKtx2": false,
+          "unknownRequiredExtensions": []
+        },
+        "preview_image": {
+          "artifactId": "preview_image",
+          "role": "preview_image",
+          "format": "webp",
+          "contentType": "image/webp",
+          "filename": "tumbling-hull-section-yh8cmz7x-preview.webp",
+          "localPath": "public/assets/mint/debris-04/preview_image.webp",
+          "loaderHint": "image",
+          "byteSize": 85332
+        }
+      },
+      "thumbnailUrl": "public/assets/mint/debris-04/preview_image.webp"
+    },
+    "debris-05": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "model",
+        "assetId": "ks76e5wme4gqh7k1tmsg93h6518cm2cp"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "original_glb": {
+          "artifactId": "original_glb",
+          "role": "canonical_model",
+          "format": "glb",
+          "contentType": "model/gltf-binary",
+          "filename": "docking-ring-fragment-518cm2cp-original.glb",
+          "localPath": "public/assets/mint/debris-05/original_glb.glb",
+          "loaderHint": "gltf",
+          "byteSize": 1222224,
+          "extensionsUsed": [],
+          "extensionsRequired": [],
+          "usesDraco": false,
+          "requiresDraco": false,
+          "usesMeshopt": false,
+          "requiresMeshopt": false,
+          "usesKtx2": false,
+          "requiresKtx2": false,
+          "unknownRequiredExtensions": []
+        },
+        "preview_image": {
+          "artifactId": "preview_image",
+          "role": "preview_image",
+          "format": "webp",
+          "contentType": "image/webp",
+          "filename": "docking-ring-fragment-518cm2cp-preview.webp",
+          "localPath": "public/assets/mint/debris-05/preview_image.webp",
+          "loaderHint": "image",
+          "byteSize": 90444
+        }
+      },
+      "thumbnailUrl": "public/assets/mint/debris-05/preview_image.webp"
+    },
+    "debris-06": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "model",
+        "assetId": "ks7717h79f62496shed5ntz1ed8cmbrm"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "original_glb": {
+          "artifactId": "original_glb",
+          "role": "canonical_model",
+          "format": "glb",
+          "contentType": "model/gltf-binary",
+          "filename": "debris-cluster-ed8cmbrm-original.glb",
+          "localPath": "public/assets/mint/debris-06/original_glb.glb",
+          "loaderHint": "gltf",
+          "byteSize": 1220828,
+          "extensionsUsed": [],
+          "extensionsRequired": [],
+          "usesDraco": false,
+          "requiresDraco": false,
+          "usesMeshopt": false,
+          "requiresMeshopt": false,
+          "usesKtx2": false,
+          "requiresKtx2": false,
+          "unknownRequiredExtensions": []
+        },
+        "preview_image": {
+          "artifactId": "preview_image",
+          "role": "preview_image",
+          "format": "webp",
+          "contentType": "image/webp",
+          "filename": "debris-cluster-ed8cmbrm-preview.webp",
+          "localPath": "public/assets/mint/debris-06/preview_image.webp",
+          "loaderHint": "image",
+          "byteSize": 106260
+        }
+      },
+      "thumbnailUrl": "public/assets/mint/debris-06/preview_image.webp"
+    },
+    "drive-core": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "model",
+        "assetId": "ks7b9p5597shx8fcrnk56wkk5d8cnb06"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "original_glb": {
+          "artifactId": "original_glb",
+          "role": "canonical_model",
+          "format": "glb",
+          "contentType": "model/gltf-binary",
+          "filename": "charred-pulse-core-5d8cnb06-original.glb",
+          "localPath": "public/assets/mint/drive-core/original_glb.glb",
+          "loaderHint": "gltf",
+          "byteSize": 1035276,
+          "extensionsUsed": [],
+          "extensionsRequired": [],
+          "usesDraco": false,
+          "requiresDraco": false,
+          "usesMeshopt": false,
+          "requiresMeshopt": false,
+          "usesKtx2": false,
+          "requiresKtx2": false,
+          "unknownRequiredExtensions": []
+        },
+        "preview_image": {
+          "artifactId": "preview_image",
+          "role": "preview_image",
+          "format": "webp",
+          "contentType": "image/webp",
+          "filename": "charred-pulse-core-5d8cnb06-preview.webp",
+          "localPath": "public/assets/mint/drive-core/preview_image.webp",
+          "loaderHint": "image",
+          "byteSize": 53410
+        }
+      },
+      "thumbnailUrl": "public/assets/mint/drive-core/preview_image.webp"
+    },
+    "ship-hull": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "model",
+        "assetId": "ks71fhvyzn2k77aw83hp9s8r018cmn5v"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "original_glb": {
+          "artifactId": "original_glb",
+          "role": "canonical_model",
+          "format": "glb",
+          "contentType": "model/gltf-binary",
+          "filename": "conestoga-fusion-hauler-018cmn5v-original.glb",
+          "localPath": "public/assets/mint/ship-hull/original_glb.glb",
+          "loaderHint": "gltf",
+          "byteSize": 1071280,
+          "extensionsUsed": [],
+          "extensionsRequired": [],
+          "usesDraco": false,
+          "requiresDraco": false,
+          "usesMeshopt": false,
+          "requiresMeshopt": false,
+          "usesKtx2": false,
+          "requiresKtx2": false,
+          "unknownRequiredExtensions": []
+        },
+        "preview_image": {
+          "artifactId": "preview_image",
+          "role": "preview_image",
+          "format": "webp",
+          "contentType": "image/webp",
+          "filename": "conestoga-fusion-hauler-018cmn5v-preview.webp",
+          "localPath": "public/assets/mint/ship-hull/preview_image.webp",
+          "loaderHint": "image",
+          "byteSize": 74558
+        }
+      },
+      "thumbnailUrl": "public/assets/mint/ship-hull/preview_image.webp"
+    },
+    "station-01": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "model",
+        "assetId": "ks720kzfkqdfr7den3fkyek2vd8cnqxt"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "original_glb": {
+          "artifactId": "original_glb",
+          "role": "canonical_model",
+          "format": "glb",
+          "contentType": "model/gltf-binary",
+          "filename": "leo-transfer-ring-vd8cnqxt-original.glb",
+          "localPath": "public/assets/mint/station-01/original_glb.glb",
+          "loaderHint": "gltf",
+          "byteSize": 1244456,
+          "extensionsUsed": [],
+          "extensionsRequired": [],
+          "usesDraco": false,
+          "requiresDraco": false,
+          "usesMeshopt": false,
+          "requiresMeshopt": false,
+          "usesKtx2": false,
+          "requiresKtx2": false,
+          "unknownRequiredExtensions": []
+        },
+        "preview_image": {
+          "artifactId": "preview_image",
+          "role": "preview_image",
+          "format": "webp",
+          "contentType": "image/webp",
+          "filename": "leo-transfer-ring-vd8cnqxt-preview.webp",
+          "localPath": "public/assets/mint/station-01/preview_image.webp",
+          "loaderHint": "image",
+          "byteSize": 132294
+        }
+      },
+      "thumbnailUrl": "public/assets/mint/station-01/preview_image.webp"
+    },
+    "station-02": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "model",
+        "assetId": "ks765gfndnqqq27az9ws87waw58cmy0p"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "original_glb": {
+          "artifactId": "original_glb",
+          "role": "canonical_model",
+          "format": "glb",
+          "contentType": "model/gltf-binary",
+          "filename": "lunar-gateway-w58cmy0p-original.glb",
+          "localPath": "public/assets/mint/station-02/original_glb.glb",
+          "loaderHint": "gltf",
+          "byteSize": 1164724,
+          "extensionsUsed": [],
+          "extensionsRequired": [],
+          "usesDraco": false,
+          "requiresDraco": false,
+          "usesMeshopt": false,
+          "requiresMeshopt": false,
+          "usesKtx2": false,
+          "requiresKtx2": false,
+          "unknownRequiredExtensions": []
+        },
+        "preview_image": {
+          "artifactId": "preview_image",
+          "role": "preview_image",
+          "format": "webp",
+          "contentType": "image/webp",
+          "filename": "lunar-gateway-w58cmy0p-preview.webp",
+          "localPath": "public/assets/mint/station-02/preview_image.webp",
+          "loaderHint": "image",
+          "byteSize": 96432
+        }
+      },
+      "thumbnailUrl": "public/assets/mint/station-02/preview_image.webp"
+    },
+    "station-03": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "model",
+        "assetId": "ks720gjkwbse422v856nkg35qd8cn6z5"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "original_glb": {
+          "artifactId": "original_glb",
+          "role": "canonical_model",
+          "format": "glb",
+          "contentType": "model/gltf-binary",
+          "filename": "l1-waystation-qd8cn6z5-original.glb",
+          "localPath": "public/assets/mint/station-03/original_glb.glb",
+          "loaderHint": "gltf",
+          "byteSize": 1014016,
+          "extensionsUsed": [],
+          "extensionsRequired": [],
+          "usesDraco": false,
+          "requiresDraco": false,
+          "usesMeshopt": false,
+          "requiresMeshopt": false,
+          "usesKtx2": false,
+          "requiresKtx2": false,
+          "unknownRequiredExtensions": []
+        },
+        "preview_image": {
+          "artifactId": "preview_image",
+          "role": "preview_image",
+          "format": "webp",
+          "contentType": "image/webp",
+          "filename": "l1-waystation-qd8cn6z5-preview.webp",
+          "localPath": "public/assets/mint/station-03/preview_image.webp",
+          "loaderHint": "image",
+          "byteSize": 87454
+        }
+      },
+      "thumbnailUrl": "public/assets/mint/station-03/preview_image.webp"
+    },
+    "station-04": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "model",
+        "assetId": "ks761wd9fyvcwws9a158xm08s98cmt9x"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "original_glb": {
+          "artifactId": "original_glb",
+          "role": "canonical_model",
+          "format": "glb",
+          "contentType": "model/gltf-binary",
+          "filename": "ceres-depot-s98cmt9x-original.glb",
+          "localPath": "public/assets/mint/station-04/original_glb.glb",
+          "loaderHint": "gltf",
+          "byteSize": 970056,
+          "extensionsUsed": [],
+          "extensionsRequired": [],
+          "usesDraco": false,
+          "requiresDraco": false,
+          "usesMeshopt": false,
+          "requiresMeshopt": false,
+          "usesKtx2": false,
+          "requiresKtx2": false,
+          "unknownRequiredExtensions": []
+        },
+        "preview_image": {
+          "artifactId": "preview_image",
+          "role": "preview_image",
+          "format": "webp",
+          "contentType": "image/webp",
+          "filename": "ceres-depot-s98cmt9x-preview.webp",
+          "localPath": "public/assets/mint/station-04/preview_image.webp",
+          "loaderHint": "image",
+          "byteSize": 96644
+        }
+      },
+      "thumbnailUrl": "public/assets/mint/station-04/preview_image.webp"
+    },
+    "station-05": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "model",
+        "assetId": "ks7cnzt0aj80yt9c9tjgw9hevn8cnjb8"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "original_glb": {
+          "artifactId": "original_glb",
+          "role": "canonical_model",
+          "format": "glb",
+          "contentType": "model/gltf-binary",
+          "filename": "phobos-station-vn8cnjb8-original.glb",
+          "localPath": "public/assets/mint/station-05/original_glb.glb",
+          "loaderHint": "gltf",
+          "byteSize": 955364,
+          "extensionsUsed": [],
+          "extensionsRequired": [],
+          "usesDraco": false,
+          "requiresDraco": false,
+          "usesMeshopt": false,
+          "requiresMeshopt": false,
+          "usesKtx2": false,
+          "requiresKtx2": false,
+          "unknownRequiredExtensions": []
+        },
+        "preview_image": {
+          "artifactId": "preview_image",
+          "role": "preview_image",
+          "format": "webp",
+          "contentType": "image/webp",
+          "filename": "phobos-station-vn8cnjb8-preview.webp",
+          "localPath": "public/assets/mint/station-05/preview_image.webp",
+          "loaderHint": "image",
+          "byteSize": 90650
+        }
+      },
+      "thumbnailUrl": "public/assets/mint/station-05/preview_image.webp"
+    }
+  }
+}

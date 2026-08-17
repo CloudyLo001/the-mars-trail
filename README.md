@@ -79,6 +79,22 @@ tests/          sim.balance.ts (headless) · visual.spec.ts (Playwright)
 The sim owns all state. Rendering and UI read it and call commands; they never mutate it.
 Every gameplay roll goes through a seeded RNG, so a seed reproduces a run exactly.
 
+### Display settings
+
+A **⚙ Settings** button sits bottom-right and is available at any time — it only affects
+presentation, never the simulation, so it is safe to open mid-run.
+
+| Setting | Options |
+| --- | --- |
+| **Pixelation** | Chunky (180p) · **Classic (270p, default)** · Sharp (405p) · HD (540p) |
+| **Brightness** | Dim · **Normal** · Bright · Brightest |
+| **Retro filter** | Off · On (monochrome CRT green) |
+
+Classic stays the default: 270p is the resolution the palette clamp, 4×4 dither grid, and 2px
+scanlines were tuned against. Higher settings keep the same treatment and simply resolve more
+detail in the generated models. Choices persist in `localStorage` and fall back to defaults if
+a stored preset no longer exists.
+
 ### Travel direction
 
 The hull sits right of centre with its drive cores strung out to the **left** (leading, like a
@@ -162,5 +178,6 @@ generated asset is required. Crew portraits are 1024px source art displayed at ~
 
 The dev server runs on **port 5188** (`vite.config.ts` pins it with `strictPort`).
 `.claude/launch.json` must match, or the preview waits on a port with nothing listening.
-#   t h e - m a r s - t r a i l  
+#   t h e - m a r s - t r a i l 
+ 
  

@@ -1,0 +1,36 @@
+{
+  "name": "mars-trail",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "playwright test",
+    "verify:visual": "playwright test tests/visual.spec.ts",
+    "inspect:canvas": "node scripts/inspect-threejs-canvas.mjs",
+    "test:sim": "tsx tests/sim.balance.ts && tsx tests/sim.store.ts",
+    "test:balance": "tsx tests/sim.balance.ts",
+    "test:store": "tsx tests/sim.store.ts",
+    "test:openings": "tsx tests/sim.openings.ts",
+    "test:qa": "playwright test tests/qa.spec.ts --project=desktop-chrome"
+  },
+  "dependencies": {
+    "lil-gui": "^0.21.0",
+    "three": "^0.184.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "@types/node": "^25.9.0",
+    "@types/pngjs": "^6.0.5",
+    "@types/three": "^0.184.1",
+    "pngjs": "^7.0.0",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.13",
+    "tsx": "^4.23.12"
+  },
+  "optionalDependencies": {
+    "@rolldown/binding-win32-x64-msvc": "^1.2.4"
+  }
+}
