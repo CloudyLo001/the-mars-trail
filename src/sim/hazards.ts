@@ -9,6 +9,7 @@
  */
 
 import { killCrew } from './tick';
+import { flightSequenceFor } from './content';
 import { currentRoute, livingCrew, pushLog } from './state';
 import type { GameState, LogEntry, Waypoint } from './types';
 
@@ -16,7 +17,19 @@ type Rng = () => number;
 
 const clamp = (value: number, min = 0, max = 100) => Math.min(max, Math.max(min, value));
 
-export type HazardOptionId = 'burn' | 'creep' | 'escort' | 'hold';
+export type HazardOptionId = 'burn' | 'fly' | 'creep' | 'escort' | 'hold';
+
+/**
+ * Map flight performance onto a hazard grade.
+ *
+ * Skill replaces the dice for this option only; the consequences it feeds are
+ * the same ones every other option feeds.
+ */
+export function flightGrade(performance: number): HazardResolution['grade'] {
+  if (performance >= 0.62) return 'clean';
+  if (performance >= 0.28) return 'setback';
+  return 'disaster';
+}
 
 export interface HazardOption {
   id: HazardOptionId;
@@ -49,8 +62,33 @@ export function hazardOptions(state: GameState, waypoint: Waypoint): HazardOptio
   const price = escortPrice(state, waypoint);
   const creepCells = Math.round(8 + waypoint.severity * 22);
   const isFinale = waypoint.kind === 'finale';
+  const flyable = flightSequenceFor(waypoint.id) !== null;
 
-  return [
+  const options: HazardOption[] = [];
+
+  // Flying is offered FIRST, in the slot burn-through occupies elsewhere.
+  // The QA sweep drives the overlay by clicking the last enabled button, so an
+  // option appended at the end would be taken blindly by automation that
+  // cannot actually fly.
+  if (flyable) {
+    options.push({
+      id: 'fly',
+      label: isFinale ? 'Fly the descent yourself' : 'Fly it yourself',
+      detail: isFinale
+        ? 'Take the stick and thread the canyon onto the pad. How well you fly is how well it goes.'
+        : 'Take the stick. No escort, no waiting — how well you fly is how well it goes.',
+      riskMultiplier: 1,
+      days: 0,
+      // Manoeuvring burns real margin, so skill is never a free win against
+      // the options that cost credits or days.
+      propellantCells: 4,
+      credits: 0,
+      available: state.inventory.propellantCells >= 4,
+      unavailableReason: 'Needs 4 propellant cells',
+    });
+  }
+
+  const rest: HazardOption[] = [
     {
       id: 'burn',
       label: isFinale ? 'Commit to the descent' : 'Burn straight through',
@@ -101,6 +139,11 @@ export function hazardOptions(state: GameState, waypoint: Waypoint): HazardOptio
       unavailableReason: 'Not enough window left to wait',
     },
   ];
+
+  // Burning straight through is replaced by flying where a sequence exists —
+  // omitted rather than disabled, so it cannot be silently selected.
+  options.push(...rest.filter((option) => !(flyable && option.id === 'burn')));
+  return options;
 }
 
 /** Effective severity after route, weather, and ship condition. */
@@ -118,11 +161,32 @@ export function resolveHazard(
   waypoint: Waypoint,
   optionId: HazardOptionId,
   rng: Rng,
+  /**
+   * Flight performance, 0-1, when the player flew this hazard.
+   *
+   * Left undefined the `fly` option behaves exactly like burning through —
+   * same risk multiplier, same dice. That is what lets the headless balance
+   * harness, the autoplay bots, and an aborted sequence all resolve a flyable
+   * waypoint without a renderer and without shifting the statistics.
+   */
+  performance?: number,
 ): HazardResolution {
   const entries: LogEntry[] = [];
-  const option = hazardOptions(state, waypoint).find((entry) => entry.id === optionId);
+  const available = hazardOptions(state, waypoint);
+  let option = available.find((entry) => entry.id === optionId);
+
   if (!option) {
-    return { grade: 'clean', headline: 'Nothing happened.', detail: '', entries };
+    // An unrecognised option must never be a free pass. This is reachable now
+    // that `burn` is omitted at flyable waypoints: any caller still asking for
+    // it — an old bot policy, a stale save — would otherwise be handed a clean
+    // transit at no cost. Fall back to the riskiest real option instead.
+    option =
+      available.find((entry) => entry.id === 'burn') ??
+      available.find((entry) => entry.id === 'fly') ??
+      available[0];
+    if (!option) {
+      return { grade: 'clean', headline: 'Nothing happened.', detail: '', entries };
+    }
   }
 
   // Pay the cost first so a disaster still leaves the player poorer.
@@ -144,7 +208,11 @@ export function resolveHazard(
 
   const roll = rng();
 
-  if (roll >= risk) {
+  // Skill replaces the roll only when a flight was actually flown.
+  const flown = optionId === 'fly' && performance !== undefined;
+  const grade = flown ? flightGrade(performance) : null;
+
+  if (flown ? grade === 'clean' : roll >= risk) {
     const headline = isFinale ? 'DOWN AND INTACT' : 'CLEAN TRANSIT';
     const detail = isFinale
       ? 'The shield holds, the chutes bite, and the ship settles onto the pad at Ares Basin.'
@@ -157,7 +225,7 @@ export function resolveHazard(
     return { grade: 'clean', headline, detail, entries };
   }
 
-  if (roll >= risk * 0.34) {
+  if (flown ? grade === 'setback' : roll >= risk * 0.34) {
     return applySetback(state, waypoint, rng, entries);
   }
 

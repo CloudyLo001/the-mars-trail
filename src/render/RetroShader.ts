@@ -34,6 +34,16 @@ export const RetroShader = {
     uVignette: { value: 0.16 },
     /** Low-res buffer size, needed for scanline and dither alignment. */
     uResolution: { value: new THREE.Vector2(480, 270) },
+    /**
+     * Size, in buffer pixels, of one retro "pixel".
+     *
+     * The dither grid and scanlines were authored against a 270px buffer where
+     * one buffer pixel was one visible pixel. Rendering at 540p or higher with
+     * a cell of 1 collapses the scanline into a shimmering one-pixel comb and
+     * makes the dither invisible noise. Scaling the cell with the buffer keeps
+     * the effect the same apparent size at any resolution.
+     */
+    uRetroCell: { value: 1 },
     /** Phosphor hue. Defaults to the HUD's green. */
     uPhosphorColor: { value: new THREE.Color('#4ae24a') },
   },
@@ -56,6 +66,7 @@ export const RetroShader = {
     uniform float uScanline;
     uniform float uVignette;
     uniform vec2 uResolution;
+    uniform float uRetroCell;
     uniform vec3 uPhosphorColor;
 
     varying vec2 vUv;
@@ -80,7 +91,9 @@ export const RetroShader = {
 
     void main() {
       vec4 source = texture2D(tDiffuse, vUv);
-      vec2 pixel = vUv * uResolution;
+      // Quantise to retro-cell space so the dither and scanline period stay a
+      // constant apparent size however large the buffer is.
+      vec2 pixel = floor(vUv * uResolution / uRetroCell);
 
       // Exposure and black lift happen before quantisation so the palette
       // steps land on the brightened values rather than being stretched after.

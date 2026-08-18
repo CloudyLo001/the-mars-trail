@@ -61,9 +61,6 @@ body {
   width: 100%;
   height: 100%;
   display: block;
-  /* Nearest-neighbour upscale of the low-res buffer happens in the shader, but
-     this keeps browser-side scaling from softening the result. */
-  image-rendering: pixelated;
 }
 
 /* ---------------------------------------------------------------- HUD shell */
@@ -1183,6 +1180,95 @@ button:disabled {
 
 .boot-status.is-error {
   color: var(--red);
+}
+
+/* ------------------------------------------------------------- Flight HUD */
+
+.flight-hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: 18px 22px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.flight-hud[hidden] {
+  display: none;
+}
+
+.flight-top {
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+}
+
+.flight-title {
+  color: var(--green);
+  font-size: 13px;
+  letter-spacing: 0.22em;
+  text-shadow: 0 0 10px rgba(74, 226, 74, 0.4);
+}
+
+.flight-progress {
+  width: min(420px, 60vw);
+  height: 3px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.flight-progress-fill {
+  height: 100%;
+  width: 0;
+  background: var(--green);
+  box-shadow: 0 0 8px rgba(74, 226, 74, 0.7);
+}
+
+.flight-warning {
+  align-self: center;
+  justify-self: center;
+  color: var(--red);
+  font-size: 15px;
+  letter-spacing: 0.18em;
+  text-shadow: 0 0 12px rgba(226, 86, 74, 0.5);
+  animation: flight-blink 0.5s steps(1) infinite;
+}
+
+.flight-warning[hidden] {
+  display: none;
+}
+
+@keyframes flight-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0.25; }
+}
+
+.flight-bottom {
+  display: flex;
+  align-items: flex-end;
+  gap: 26px;
+}
+
+.flight-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  color: var(--green);
+  font-size: 19px;
+}
+
+.flight-stat small {
+  color: var(--text-dim);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+
+.flight-hint {
+  margin-left: auto;
+  color: var(--text-dim);
+  font-size: 10px;
+  letter-spacing: 0.1em;
 }
 
 /* ---------------------------------------------------------- Settings entry */

@@ -13,10 +13,15 @@ import { GameAssets } from '../assets/GameAssets';
 import { PixelPipeline } from '../render/PixelPipeline';
 import { TravelScene } from '../scene/TravelScene';
 import { AudioSystem } from '../systems/AudioSystem';
+import { FlightController, type FlightRequest } from '../flight/FlightController';
+import { sequenceConfig } from '../flight/model/sequences';
+import type { FlightRunResult, FlightSequenceId } from '../flight/model/types';
+import { InputController } from '../core/InputController';
+import { FlightHud } from '../ui/FlightHud';
 import { Hud } from '../ui/Hud';
 import { Screens } from '../ui/Screens';
 import { loadSettings, saveSettings, type DisplaySettings } from '../ui/settings';
-import { MarsTrailSim, autoplay, effectiveSeverity, formatDistance } from '../sim';
+import { MarsTrailSim, autoplay, effectiveSeverity, flightSequenceFor, formatDistance } from '../sim';
 import type { AutoplayStyle, BurnRate, GameState, HazardOptionId, Phase, RationLevel } from '../sim';
 import { createSeededRandom } from '../utils/random';
 
@@ -43,6 +48,12 @@ export class Game {
   private readonly sim = new MarsTrailSim();
   private readonly screens: Screens;
   private readonly hud: Hud;
+  private readonly flightHud = new FlightHud();
+  private readonly input: InputController;
+  /** Non-null while a real-time sequence owns the screen. */
+  private flight: FlightController | null = null;
+  /** Set by the test hook so a sequence can be replayed deterministically. */
+  private flightSeedOverride: number | null = null;
   private readonly loop: Loop;
 
   private readonly bootStatus = document.querySelector<HTMLElement>('#boot-status')!;
@@ -68,11 +79,12 @@ export class Game {
 
   constructor(private readonly canvas: HTMLCanvasElement) {
     this.renderer = createRenderer(canvas);
-    // Tone mapping is deliberately linear: the posterise pass owns the final
-    // value distribution, and ACES would soften the bands it depends on.
-    this.renderer.toneMapping = THREE.NoToneMapping;
-    this.renderer.shadowMap.enabled = false;
+    // ACES tone mapping and shadows come from createRenderer and now stand.
+    // They used to be overridden to linear because the posterise pass owned the
+    // frame's value distribution; with the retro treatment off by default, that
+    // override only flattened the image.
 
+    this.input = new InputController(canvas);
     this.scene = new TravelScene(this.rng, 'earth-orbit');
     this.pipeline = new PixelPipeline(this.renderer, this.scene.scene, this.scene.camera);
 
@@ -123,6 +135,13 @@ export class Game {
         }
         this.audio.play('ui-confirm');
         this.audio.startAmbience();
+        // Wait for the launch complex and the debris field before starting.
+        // Both are small, the outfitting screen has already given them time,
+        // and beginning the ascent over an empty desert then popping the pad in
+        // a second later looks worse than a brief pause here.
+        void this.assets.ensureFamilies(['desert', 'asteroid']).then(() => {
+          this.startLaunch();
+        });
       },
       onChooseRoute: (routeId) => {
         this.audio.play('ui-confirm');
@@ -134,7 +153,23 @@ export class Game {
         this.audio.play('ui-click');
         this.showOutcome('Resolved', text, false);
       },
-      onHazardChoice: (optionId) => this.resolveHazard(optionId),
+      onHazardChoice: (optionId) => {
+        if (optionId !== 'fly') {
+          this.resolveHazard(optionId);
+          return;
+        }
+        const waypoint = this.sim.nextWaypoint();
+        const sequence = waypoint ? flightSequenceFor(waypoint.id) : null;
+        if (!sequence) {
+          // No sequence for this waypoint: fall back to the dice rather than
+          // stranding the player on a card with a dead button.
+          this.resolveHazard('fly');
+          return;
+        }
+        this.beginFlight(sequence as FlightSequenceId, (result) =>
+          this.resolveHazard('fly', result.performance),
+        );
+      },
       onStationService: (serviceId) => {
         const text = this.sim.stationService(serviceId);
         this.audio.play('ui-confirm');
@@ -280,6 +315,8 @@ export class Game {
 
   dispose(): void {
     this.loop.stop();
+    this.input.detach();
+    this.flight?.dispose();
     this.audio.dispose();
     this.pipeline.dispose();
     this.scene.dispose();
@@ -308,12 +345,111 @@ export class Game {
     this.filterButton = button;
   }
 
+  /**
+   * Fly the ascent out of Earth's atmosphere.
+   *
+   * Retryable and consequence-free by design: a botched climb resets to the
+   * pad rather than ending a run the player has just spent ten minutes
+   * outfitting. That also makes it the tutorial for the controls.
+   */
+  private startLaunch(): void {
+    this.beginFlight('launch', (result) => {
+      if (result.performance < 0.3) {
+        this.showOutcome(
+          'ABORT TO PAD',
+          'You never cleared the tower cleanly. The vehicle is recovered, the pad is reset, and nothing is lost but the morning. Fly it again.',
+          true,
+          () => this.startLaunch(),
+        );
+        return;
+      }
+      this.showOutcome(
+        'ORBIT ACHIEVED',
+        result.performance > 0.75
+          ? 'A clean ascent. The tower falls away, the sky goes black, and Mars is two hundred and twenty-five million kilometres ahead.'
+          : 'Rough, but you are up. The sky goes black and the real crossing begins.',
+        false,
+      );
+    });
+  }
+
+  /**
+   * Hand the screen to a real-time sequence.
+   *
+   * The pipeline already supports swapping its scene and camera, so this costs
+   * nothing structurally — the turn-based scene stays intact and is restored
+   * untouched when the sequence resolves.
+   */
+  private beginFlight(sequence: FlightSequenceId, onComplete: (r: FlightRunResult) => void): void {
+    if (this.flight) return;
+    const config = sequenceConfig(sequence);
+
+    const props =
+      config.family === 'debris'
+        ? this.assets.debris
+        : config.family === 'asteroid'
+          ? this.assets.asteroids
+          : [];
+
+    const request: FlightRequest = {
+      sequence,
+      seed:
+        this.flightSeedOverride ??
+        this.sim.get().day * 7919 + this.sim.get().legIndex * 131 + 17,
+      props,
+      onComplete: (result) => this.endFlight(result, onComplete),
+    };
+
+    this.flight = new FlightController(
+      request,
+      this.input,
+      this.rng,
+      () => this.reducedMotion,
+      // The ascent flies the launch vehicle over the desert complex; every
+      // other sequence flies the transit hull through open space.
+      sequence === 'launch' ? this.assets.desert : [],
+    );
+    const vehicle = sequence === 'launch' ? (this.assets.rocket ?? this.assets.hull) : this.assets.hull;
+    if (vehicle) this.flight.setShipModel(vehicle.clone(true));
+
+    this.pipeline.setSceneAndCamera(this.flight.scene.scene, this.flight.scene.chase.camera);
+    this.flight.resize(this.canvas.clientWidth / Math.max(1, this.canvas.clientHeight));
+    this.input.attach();
+
+    this.screens.hide();
+    this.hud.setVisible(false);
+    this.flightHud.setTitle(config.title);
+    this.flightHud.setVisible(true);
+    this.audio.play('hazard');
+  }
+
+  private endFlight(result: FlightRunResult, onComplete: (r: FlightRunResult) => void): void {
+    this.input.detach();
+    this.flightHud.setVisible(false);
+
+    // Restore the turn-based scene before anything re-renders.
+    this.pipeline.setSceneAndCamera(this.scene.scene, this.scene.camera);
+    this.flight?.dispose();
+    this.flight = null;
+
+    onComplete(result);
+    // renderPhase caches the last phase, and it went stale while the overlay
+    // pre-empted routing, so this must force.
+    this.renderPhase(true);
+  }
+
   /** Push display settings into the render pipeline. Presentation only. */
   private applySettings(): void {
     this.pipeline.setInternalHeight(this.settings.internalHeight);
     this.pipeline.resize(this.canvas.clientWidth, this.canvas.clientHeight);
     this.pipeline.setExposure(this.settings.exposure);
     this.pipeline.setPhosphor(this.settings.phosphor);
+    this.pipeline.setRetro(this.settings.retro);
+    // The retro treatment owns the value range when it is on, so linear
+    // tone mapping is correct there and ACES is correct otherwise.
+    this.renderer.toneMapping = this.settings.retro
+      ? THREE.NoToneMapping
+      : THREE.ACESFilmicToneMapping;
   }
 
   /**
@@ -364,8 +500,8 @@ export class Game {
     this.screens.renderOutcome(title, text, { bad });
   }
 
-  private resolveHazard(optionId: HazardOptionId): void {
-    const resolution = this.sim.resolveHazard(optionId);
+  private resolveHazard(optionId: HazardOptionId, performance?: number): void {
+    const resolution = this.sim.resolveHazard(optionId, performance);
     if (!resolution) return;
 
     this.audio.play(resolution.grade === 'disaster' ? 'death' : 'hazard');
@@ -402,6 +538,14 @@ export class Game {
     // An outcome card owns the screen until acknowledged.
     if (this.pendingOutcome && state.outcome === 'in-progress') {
       this.updateHud(state);
+      return;
+    }
+
+    // A live sequence owns the screen ahead of every modal overlay.
+    if (this.flight) {
+      this.screens.hide();
+      this.hud.setVisible(false);
+      this.flightHud.setVisible(true);
       return;
     }
 
@@ -525,6 +669,13 @@ export class Game {
       this.scene.resize(this.canvas.clientWidth / Math.max(1, this.canvas.clientHeight));
     }
 
+    if (this.flight) {
+      this.flight.update(delta, elapsed);
+      if (this.flight) this.flightHud.update(this.flight.view);
+      this.publishDiagnostics();
+      return;
+    }
+
     const state = this.sim.get();
     const moving = state.phase === 'travel' && state.outcome === 'in-progress';
     const burnFactor = BURN_FACTOR[state.burnRate];
@@ -616,6 +767,32 @@ export class Game {
        * real score screen. Every step goes through the normal commands, so the
        * ending is one a player could actually reach.
        */
+      startFlight: (sequence: string, seed: number) => {
+        this.flightSeedOverride = seed;
+        this.beginFlight(sequence as FlightSequenceId, () => this.renderPhase(true));
+        this.flightSeedOverride = null;
+      },
+      setFlightAutopilot: (skill: number | null) => {
+        this.flight?.setAutopilot(skill);
+      },
+      flightSnapshot: () => {
+        if (!this.flight) return { active: false };
+        const view = this.flight.view;
+        return {
+          active: true,
+          sequence: this.flight.sequence,
+          seconds: view.seconds,
+          progress: view.progress,
+          hits: view.hits,
+          shipX: view.shipX,
+          shipY: view.shipY,
+          cinematic: view.cinematic,
+          liftoff: view.liftoff,
+        };
+      },
+      abortFlight: () => {
+        this.flight?.abort();
+      },
       playToEnd: (style: string, seed: number) => {
         this.tutorialOpen = false;
         this.logOpen = false;
@@ -658,6 +835,14 @@ export class Game {
         livingCrew: state.crew.filter((member) => member.alive).length,
         rationsKg: Math.round(state.inventory.rationsKg),
       },
+      flight: this.flight
+        ? {
+            active: true,
+            sequence: this.flight.sequence,
+            progress: this.flight.view.progress,
+            hits: this.flight.view.hits,
+          }
+        : { active: false },
       pipeline: {
         internalWidth: buffer.width,
         internalHeight: buffer.height,

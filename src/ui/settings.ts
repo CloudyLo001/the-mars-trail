@@ -6,7 +6,9 @@
  * survives a reload.
  */
 
-const STORAGE_KEY = 'mars-trail:display-settings';
+// Bumped when the defaults changed: a stored 270 is still a valid preset, so
+// without a new key every returning player would stay on the old pixel look.
+const STORAGE_KEY = 'mars-trail:display-settings:v2';
 
 export interface DisplaySettings {
   /** Internal render height in pixels. Lower is chunkier. */
@@ -15,6 +17,8 @@ export interface DisplaySettings {
   exposure: number;
   /** Monochrome CRT filter. */
   phosphor: boolean;
+  /** Palette clamp, ordered dither, and scanlines. Off is the modern look. */
+  retro: boolean;
 }
 
 export interface SettingOption<T> {
@@ -24,16 +28,15 @@ export interface SettingOption<T> {
 }
 
 /**
- * Pixelation presets. 270 is the authored look and stays the default: it is
- * the resolution the palette clamp, dither grid, and 2px scanlines were tuned
- * against. Higher settings keep the same treatment but resolve more detail in
- * the generated models.
+ * Internal render resolution. 540 is the default: high enough that the
+ * generated models read as models rather than sprites, while still rendering
+ * offscreen so the retro treatment remains available.
  */
 export const PIXELATION_OPTIONS: Array<SettingOption<number>> = [
-  { label: 'Chunky', value: 180, detail: 'Coarsest. Big, obvious pixels.' },
-  { label: 'Classic', value: 270, detail: 'The authored look. Default.' },
-  { label: 'Sharp', value: 405, detail: 'Finer grain, models read more clearly.' },
-  { label: 'HD', value: 540, detail: 'Barely pixelated. Closest to raw 3D.' },
+  { label: 'Chunky', value: 270, detail: 'The original pixel look.' },
+  { label: 'Sharp', value: 405, detail: 'Coarse grain, models read clearly.' },
+  { label: 'HD', value: 540, detail: 'Default. Clean and detailed.' },
+  { label: 'Ultra', value: 810, detail: 'Highest detail. Costs the most to draw.' },
 ];
 
 export const BRIGHTNESS_OPTIONS: Array<SettingOption<number>> = [
@@ -44,9 +47,10 @@ export const BRIGHTNESS_OPTIONS: Array<SettingOption<number>> = [
 ];
 
 export const DEFAULT_SETTINGS: DisplaySettings = {
-  internalHeight: 270,
+  internalHeight: 540,
   exposure: 1.6,
   phosphor: false,
+  retro: false,
 };
 
 function isValid(settings: Partial<DisplaySettings>): boolean {
@@ -70,6 +74,7 @@ export function loadSettings(): DisplaySettings {
       internalHeight: parsed.internalHeight ?? DEFAULT_SETTINGS.internalHeight,
       exposure: parsed.exposure ?? DEFAULT_SETTINGS.exposure,
       phosphor: Boolean(parsed.phosphor),
+      retro: Boolean(parsed.retro),
     };
   } catch {
     // Private browsing and disabled storage both throw here; the defaults are

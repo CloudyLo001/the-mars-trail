@@ -63,11 +63,12 @@ test('renders a nonblank canvas through the low-resolution pixel pipeline', asyn
   const sample = await sampleCanvas(page);
   expect(sample, JSON.stringify(sample)).toMatchObject({ ok: true });
 
-  // The pipeline must actually be rendering small and upscaling; a full-res
-  // buffer would mean the pixel look silently regressed to plain 3D.
+  // The scene still renders into an offscreen buffer rather than straight to
+  // the canvas; the default is now 540 rather than the old 270 pixel look.
   const pipeline = await page.evaluate(() => window.__THREE_GAME_DIAGNOSTICS__?.pipeline);
-  expect(pipeline?.internalHeight).toBe(270);
-  expect(pipeline?.internalWidth).toBeLessThanOrEqual(768);
+  expect(pipeline?.internalHeight).toBe(540);
+  expect(pipeline?.internalWidth).toBeGreaterThan(540);
+  expect(pipeline?.internalWidth).toBeLessThanOrEqual(1600);
 
   const screenshot = await page.screenshot({ fullPage: false });
   await testInfo.attach(`${testInfo.project.name}-title`, {
@@ -294,38 +295,40 @@ test('keeps scroll position while shopping', async ({ page }) => {
 test('adjusts pixelation from display settings', async ({ page }) => {
   await bootGame(page);
 
-  // Classic is the default and must stay so.
+  // HD (540) is the default and must stay so.
   expect(await page.evaluate(() => window.__THREE_GAME_DIAGNOSTICS__?.pipeline.internalHeight)).toBe(
-    270,
+    540,
   );
 
   await page.locator('#btn-settings').click();
   await expect(page.locator('.card-title')).toHaveText(/settings/i);
 
-  await page.getByRole('button', { name: /^HD/i }).click();
-  await expect
-    .poll(async () =>
-      page.evaluate(() => window.__THREE_GAME_DIAGNOSTICS__?.pipeline.internalHeight),
-    )
-    .toBe(540);
-
+  // Move away from the default FIRST, so the second click cannot be a no-op
+  // that passes without proving anything.
   await page.getByRole('button', { name: /^Chunky/i }).click();
   await expect
     .poll(async () =>
       page.evaluate(() => window.__THREE_GAME_DIAGNOSTICS__?.pipeline.internalHeight),
     )
-    .toBe(180);
+    .toBe(270);
 
-  // Buffer width must track the new height rather than staying at the old cap.
+  await page.getByRole('button', { name: /^Ultra/i }).click();
+  await expect
+    .poll(async () =>
+      page.evaluate(() => window.__THREE_GAME_DIAGNOSTICS__?.pipeline.internalHeight),
+    )
+    .toBe(810);
+
+  // Buffer width must track the chosen height rather than a fixed cap.
   const buffer = await page.evaluate(() => window.__THREE_GAME_DIAGNOSTICS__?.pipeline);
-  expect(buffer!.internalWidth).toBeGreaterThan(180);
-  expect(buffer!.internalWidth).toBeLessThan(180 * 3);
+  expect(buffer!.internalWidth).toBeGreaterThan(810);
+  expect(buffer!.internalWidth).toBeLessThan(810 * 3);
 
   // The choice must survive a reload.
   await page.reload();
   await page.waitForFunction(() => (window.__THREE_GAME_DIAGNOSTICS__?.frame ?? 0) > 5);
   expect(await page.evaluate(() => window.__THREE_GAME_DIAGNOSTICS__?.pipeline.internalHeight)).toBe(
-    180,
+    810,
   );
 
   // Leave storage clean for the other specs.

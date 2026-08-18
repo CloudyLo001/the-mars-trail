@@ -26,6 +26,12 @@ interface ThreeGameDiagnostics {
     livingCrew: number;
     rationsKg: number;
   };
+  flight: {
+    active: boolean;
+    sequence?: string;
+    progress?: number;
+    hits?: number;
+  };
   pipeline: {
     internalWidth: number;
     internalHeight: number;
@@ -71,6 +77,25 @@ interface ThreeGameTestHooks {
    * Play a complete run under a named policy and stop on the score screen.
    * Styles: 'careful' | 'reckless' | 'starve' | 'dawdle'.
    */
+  /** Start a flight sequence directly, for browser coverage. */
+  startFlight(sequence: string, seed: number): void;
+  /** Drive the live sequence with a scripted pilot; null returns control. */
+  setFlightAutopilot(skill: number | null): void;
+  /** Read the live sequence state. */
+  flightSnapshot(): {
+    active: boolean;
+    sequence?: string;
+    seconds?: number;
+    progress?: number;
+    hits?: number;
+    shipX?: number;
+    shipY?: number;
+    /** True during the scripted liftoff, before control hands over. */
+    cinematic?: boolean;
+    liftoff?: number;
+  };
+  /** Abandon the live sequence. */
+  abortFlight(): void;
   playToEnd(
     style: string,
     seed: number,

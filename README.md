@@ -21,7 +21,8 @@ Then open <http://127.0.0.1:5188>.
 | --- | --- |
 | `npm run dev` | Dev server on port 5188 |
 | `npm run build` | Typecheck, then production build |
-| `npm run test:sim` | Headless sim checks — balance harness plus store arithmetic, no browser |
+| `npm run test:sim` | All headless checks — balance, store, flight model, flight integration |
+| `npm run test:flight` | Flight model harness plus its simulation integration |
 | `npm run test:balance` | Balance harness only — plays 160 full missions |
 | `npm run test:store` | Store and sell-back credit arithmetic only |
 | `npm test` | Playwright browser checks |
@@ -53,6 +54,45 @@ Homesteader with 400 at ×3.
 
 **Win** by reaching Ares Basin with at least one crew member alive. **Lose** to a dead crew,
 a closed window, or a ship with no drive cores left.
+
+### Flying it
+
+The crossing now **begins on Earth**, on a desert launch pad.
+
+The ascent runs about **60 seconds** in three beats:
+
+1. **Liftoff (~7 s, no control).** The camera stands off beside the gantry at ground level and
+   watches the vehicle climb away, lagging deliberately so the rocket pulls out of frame. The
+   rocket stands upright, as it does on a pad. Nothing is in the way.
+2. **Handover (~2 s).** The camera swings under and behind the vehicle while the rocket
+   **pitches over** into its own line of travel — a gravity turn. Control arrives as a move
+   rather than a cut.
+3. **The climb (~50 s).** Tucked in close behind the rocket looking up the corridor: only its aft
+   end sits in the bottom of the frame and the rest is sky and whatever is coming down it. The
+   ground is gone entirely — with no horizon there is no cue that you are flying anything but
+   straight up.
+
+Steer with **WASD or the mouse**, **Shift** to boost, **Escape** to abandon.
+
+The sky is drawn as **flat opaque bands** rather than a gradient, stepping through solid colours
+as altitude builds, so the climb reads as passing through distinct layers of atmosphere. The pad,
+gantry, tank farm, blast berm, and the mesa ridge on the horizon all drop away beneath you.
+
+Three later waypoints are flyable too — the Kessler belt, the rubble shoal, and the Ares Basin
+descent. At those, **"Fly it yourself"** replaces "burn straight through" in the hazard options;
+paying for a tug, creeping on thrusters, and holding for a window all remain. How well you fly
+decides clean / setback / disaster instead of a dice roll, feeding the same consequences.
+
+A botched **launch** costs nothing but the morning — you reset to the pad and go again. It is a
+skill gate and the de facto tutorial. A botched **hazard** costs exactly what a bad dice roll
+would have.
+
+| Sequence | Character |
+| --- | --- |
+| Ascent | ~60 s. Scripted liftoff, then wide and forgiving. First contact with the controls. |
+| Kessler Belt | Dense, fast shrapnel. Reaction speed. |
+| The Rubble Shoal | Sparse but enormous rocks. Route choice, not reflexes. |
+| Ares Basin Descent | Fastest, tightest corridor. The last thing before the ground. |
 
 ### Learning it
 

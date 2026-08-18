@@ -44,8 +44,8 @@ async function canvasLuminance(page: Page): Promise<number> {
  * harness in tests/sim.balance.ts, which plays 160 complete missions.
  */
 test('sweeps the UI without dead ends or rule violations', async ({ page }, testInfo) => {
-  test.setTimeout(600_000);
-  const MAX_STEPS = 220;
+  test.setTimeout(900_000);
+  const MAX_STEPS = 200;
 
   const consoleErrors: string[] = [];
   const pageErrors: string[] = [];
@@ -80,7 +80,10 @@ test('sweeps the UI without dead ends or rule violations', async ({ page }, test
   await buyStep('Rad Suits', 2);
 
   await page.getByRole('button', { name: /leave the yard/i }).click();
-  await expect(page.locator('.card-title')).toContainText(/earth departure/i);
+
+  // Departure now drops into the playable ascent before the star chart.
+  await expect(page.locator('#flight-hud')).toBeVisible();
+  await page.evaluate(() => window.__THREE_GAME_TEST_HOOKS__?.setFlightAutopilot(0.9));
 
   // --- Playthrough ------------------------------------------------------
   const visitedPhases = new Set<string>();
@@ -101,6 +104,8 @@ test('sweeps the UI without dead ends or rule violations', async ({ page }, test
       return {
         d: window.__THREE_GAME_DIAGNOSTICS__,
         overlayVisible: visible,
+        flying: Boolean(window.__THREE_GAME_DIAGNOSTICS__?.flight.active),
+        flightSequence: window.__THREE_GAME_DIAGNOSTICS__?.flight.sequence,
         enabled: visible
           ? overlay!.querySelectorAll('button:not([disabled])').length
           : 0,
@@ -123,6 +128,22 @@ test('sweeps the UI without dead ends or rule violations', async ({ page }, test
     lastWindow = d.mission.windowDaysLeft;
 
     if (d.outcome !== 'in-progress') break;
+
+    // A real-time sequence has no buttons to click. The launch is mandatory, so
+    // it is flown by the scripted pilot; hazard sequences are abandoned with
+    // Escape instead, which is a real player action and resolves instantly.
+    // Flying every one of them in real time is what pushed this sweep past ten
+    // minutes, and exercising flight is flight.spec.ts's job, not this one's.
+    if (snapshot.flying) {
+      if (snapshot.flightSequence === 'launch') {
+        await page.evaluate(() => window.__THREE_GAME_TEST_HOOKS__?.setFlightAutopilot(0.92));
+        await page.waitForTimeout(500);
+      } else {
+        await page.evaluate(() => window.__THREE_GAME_TEST_HOOKS__?.abortFlight());
+        await page.waitForTimeout(150);
+      }
+      continue;
+    }
 
     // Prefer the travel HUD when it is live; otherwise take an overlay action.
     if (!snapshot.overlayVisible) {

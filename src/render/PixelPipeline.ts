@@ -19,7 +19,10 @@ import { RetroShader } from './RetroShader';
  * dither grid, and 2px scanlines were tuned against; the player can raise it
  * for a sharper picture through display settings.
  */
-const DEFAULT_INTERNAL_HEIGHT = 270;
+const DEFAULT_INTERNAL_HEIGHT = 540;
+
+/** Buffer height the retro treatment was authored against. */
+const RETRO_REFERENCE_HEIGHT = 270;
 
 /**
  * Widest aspect the buffer will cover before it stops growing, so an ultrawide
@@ -148,6 +151,26 @@ export class PixelPipeline {
     this.composer.setSize(this.internalSize.x, this.internalSize.y);
     this.bloomPass.setSize(this.internalSize.x, this.internalSize.y);
     this.retroPass.uniforms.uResolution.value.copy(this.internalSize);
+    // Keep one retro cell the same apparent size at every buffer height.
+    this.retroPass.uniforms.uRetroCell.value = Math.max(
+      1,
+      Math.round(this.internalSize.y / RETRO_REFERENCE_HEIGHT),
+    );
+  }
+
+  /**
+   * Turn the authored retro treatment on or off. Off is the modern look: no
+   * palette clamp, no dither, no scanlines, just the grade and a light vignette.
+   */
+  setRetro(enabled: boolean): void {
+    this.retroPass.uniforms.uPaletteStrength.value = enabled ? 1 : 0;
+    this.retroPass.uniforms.uScanline.value = enabled ? 0.09 : 0;
+    this.retroPass.uniforms.uVignette.value = enabled ? 0.16 : 0.1;
+    this.bloomPass.strength = enabled ? 0.42 : 0.28;
+  }
+
+  get retroEnabled(): boolean {
+    return this.retroPass.uniforms.uPaletteStrength.value > 0.5;
   }
 
   render(): void {

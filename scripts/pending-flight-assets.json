@@ -1,0 +1,34 @@
+{
+  "note": "Generated Mint assets for the flight sequences, awaiting sync into mint-assets.json. Fetch each model's artifact manifest via Mint MCP get_asset_artifact_manifests, then extend scripts/import-mint-manifests.mjs with the returned download hashes and re-run it. Registry keys are chosen to match GameAssets prop families: launch-* and mars-*.",
+  "projectId": "zd70a7tzytg7vrwxa409wybrm58cnynd",
+  "packs": [
+    {
+      "name": "Launch Complex Kit",
+      "assetId": "th7834ram9mph3e0087gtxpqj58cm5nx",
+      "chatUrl": "https://mint.gg/chat/ph7b7hrfnf3cv5b9ent5cgx3px8cnf8c",
+      "family": "launch",
+      "items": [
+        { "key": "launch-01", "label": "Launch Pad", "modelId": "ks766za09cw358ajsn1pbfqs0s8cm05z" },
+        { "key": "launch-02", "label": "Service Gantry", "modelId": "ks70mnt04w4b8ej2ntqxcz9z798cmbzj" },
+        { "key": "launch-03", "label": "Booster Stage", "modelId": "ks778ymy2gwcbenc8qmdmr3e658cm3zg" },
+        { "key": "launch-04", "label": "Propellant Tanks", "modelId": "ks72d25rgb6wtk8qjkwxjdkwrd8cnhxy" },
+        { "key": "launch-05", "label": "Complex Ground Tile", "modelId": "ks77d5e026qxxtrmpbmpkzep0n8cmjm9" },
+        { "key": "launch-06", "label": "Corridor Marker Ring", "modelId": "ks72n32gnydbsnwxbkg8tr9ag58cmpk0" }
+      ]
+    },
+    {
+      "name": "Mars Descent Kit",
+      "assetId": "th71926gy34q26f0xjnakqz7t98cn8pj",
+      "chatUrl": "https://mint.gg/chat/ph7fyz01p1ryh67ccsm9463py18cm0w6",
+      "family": "mars-surface",
+      "items": [
+        { "key": "mars-01", "label": "Mars Mesa Tile", "modelId": "ks75xe6gjg4j12p0rdjkzpzv5d8cmpss" },
+        { "key": "mars-02", "label": "Mars Crater Tile", "modelId": "ks73z3842grdvskdhaw3nrw0qn8cnsgd" },
+        { "key": "mars-03", "label": "Mars Dune Tile", "modelId": "ks78sdn9aac98mdm1xdq1t430d8cnf5j" },
+        { "key": "mars-04", "label": "Canyon Wall Segment", "modelId": "ks7c117j265p787a8kh3ej32558cnxeb" },
+        { "key": "mars-05", "label": "Surface Boulders", "modelId": "ks73xvw5q21mh6frj3n9nh5at98cm84n" },
+        { "key": "mars-06", "label": "Ares Basin Landing Pad", "modelId": "ks77kwqbh5caxtfa8dzhnq3v7h8cmba8" }
+      ]
+    }
+  ]
+}

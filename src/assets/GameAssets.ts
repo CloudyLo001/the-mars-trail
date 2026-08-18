@@ -25,15 +25,18 @@ const FIT_SIZES = {
   debris: 1.5,
   asteroid: 1.9,
   station: 4.2,
+  desert: 6,
+  rocket: 4.2,
 } as const;
 
 /** Prop families, loaded on demand per leg rather than all at once. */
-export type PropFamily = 'debris' | 'asteroid' | 'station';
+export type PropFamily = 'debris' | 'asteroid' | 'station' | 'desert';
 
 const FAMILY_FIT: Record<PropFamily, number> = {
   debris: FIT_SIZES.debris,
   asteroid: FIT_SIZES.asteroid,
   station: FIT_SIZES.station,
+  desert: FIT_SIZES.desert,
 };
 
 export class GameAssets {
@@ -45,6 +48,10 @@ export class GameAssets {
   debris: THREE.Object3D[] = [];
   asteroids: THREE.Object3D[] = [];
   stations: THREE.Object3D[] = [];
+  /** The desert launch complex: pad, gantry, ground, mesas, tanks, berm. */
+  desert: THREE.Object3D[] = [];
+  /** The launch vehicle, distinct from the transit hull. */
+  rocket: THREE.Object3D | null = null;
 
   portraitUrls = new Map<string, string>();
   audioUrls = new Map<string, string>();
@@ -74,6 +81,11 @@ export class GameAssets {
       }),
       this.loadInto('drive-core', FIT_SIZES.core, report, (object) => {
         this.core = object;
+      }),
+      // The ascent is the first thing a new run sees, so the vehicle it flies
+      // is essential rather than streamed with a family.
+      this.loadInto('launch-rocket', FIT_SIZES.rocket, report, (object) => {
+        this.rocket = object;
       }),
     ]);
 
@@ -109,7 +121,13 @@ export class GameAssets {
 
     const report: LoadReport = { loaded: [], missing: [], failed: [] };
     const target =
-      family === 'debris' ? this.debris : family === 'asteroid' ? this.asteroids : this.stations;
+      family === 'debris'
+        ? this.debris
+        : family === 'asteroid'
+          ? this.asteroids
+          : family === 'desert'
+            ? this.desert
+            : this.stations;
 
     const job = Promise.all(
       assetKeysWithPrefix(`${family}-`).map((key) =>

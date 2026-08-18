@@ -985,6 +985,354 @@
       },
       "thumbnailUrl": "public/assets/mint/debris-06/preview_image.webp"
     },
+    "desert-01": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "model",
+        "assetId": "ks744yra0bt53686x8f4j7ctzx8cqews"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "original_glb": {
+          "artifactId": "original_glb",
+          "role": "canonical_model",
+          "format": "glb",
+          "contentType": "model/gltf-binary",
+          "filename": "desert-launch-pad-zx8cqews-original.glb",
+          "localPath": "public/assets/mint/desert-01/original_glb.glb",
+          "loaderHint": "gltf",
+          "byteSize": 676892,
+          "extensionsUsed": [],
+          "extensionsRequired": [],
+          "usesDraco": false,
+          "requiresDraco": false,
+          "usesMeshopt": false,
+          "requiresMeshopt": false,
+          "usesKtx2": false,
+          "requiresKtx2": false,
+          "unknownRequiredExtensions": []
+        },
+        "preview_image": {
+          "artifactId": "preview_image",
+          "role": "preview_image",
+          "format": "webp",
+          "contentType": "image/webp",
+          "filename": "desert-launch-pad-zx8cqews-preview.webp",
+          "localPath": "public/assets/mint/desert-01/preview_image.webp",
+          "loaderHint": "image",
+          "byteSize": 52592
+        }
+      },
+      "thumbnailUrl": "public/assets/mint/desert-01/preview_image.webp"
+    },
+    "desert-02": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "model",
+        "assetId": "ks77yvz7kgw4zp5jkgjzx4ez0h8cqf4z"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "original_glb": {
+          "artifactId": "original_glb",
+          "role": "canonical_model",
+          "format": "glb",
+          "contentType": "model/gltf-binary",
+          "filename": "service-gantry-tower-0h8cqf4z-original.glb",
+          "localPath": "public/assets/mint/desert-02/original_glb.glb",
+          "loaderHint": "gltf",
+          "byteSize": 1107584,
+          "extensionsUsed": [],
+          "extensionsRequired": [],
+          "usesDraco": false,
+          "requiresDraco": false,
+          "usesMeshopt": false,
+          "requiresMeshopt": false,
+          "usesKtx2": false,
+          "requiresKtx2": false,
+          "unknownRequiredExtensions": []
+        },
+        "preview_image": {
+          "artifactId": "preview_image",
+          "role": "preview_image",
+          "format": "webp",
+          "contentType": "image/webp",
+          "filename": "service-gantry-tower-0h8cqf4z-preview.webp",
+          "localPath": "public/assets/mint/desert-02/preview_image.webp",
+          "loaderHint": "image",
+          "byteSize": 103568
+        }
+      },
+      "thumbnailUrl": "public/assets/mint/desert-02/preview_image.webp"
+    },
+    "desert-03": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "model",
+        "assetId": "ks7cnz99y3y80bs0tpqp3r4tw98cqwr1"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "original_glb": {
+          "artifactId": "original_glb",
+          "role": "canonical_model",
+          "format": "glb",
+          "contentType": "model/gltf-binary",
+          "filename": "desert-ground-tile-w98cqwr1-original.glb",
+          "localPath": "public/assets/mint/desert-03/original_glb.glb",
+          "loaderHint": "gltf",
+          "byteSize": 817576,
+          "extensionsUsed": [],
+          "extensionsRequired": [],
+          "usesDraco": false,
+          "requiresDraco": false,
+          "usesMeshopt": false,
+          "requiresMeshopt": false,
+          "usesKtx2": false,
+          "requiresKtx2": false,
+          "unknownRequiredExtensions": []
+        },
+        "preview_image": {
+          "artifactId": "preview_image",
+          "role": "preview_image",
+          "format": "webp",
+          "contentType": "image/webp",
+          "filename": "desert-ground-tile-w98cqwr1-preview.webp",
+          "localPath": "public/assets/mint/desert-03/preview_image.webp",
+          "loaderHint": "image",
+          "byteSize": 56912
+        }
+      },
+      "thumbnailUrl": "public/assets/mint/desert-03/preview_image.webp"
+    },
+    "desert-04": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "model",
+        "assetId": "ks7b1ft4n41nhtmv1agnb0q9758cqst4"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "original_glb": {
+          "artifactId": "original_glb",
+          "role": "canonical_model",
+          "format": "glb",
+          "contentType": "model/gltf-binary",
+          "filename": "desert-mesa-ridge-758cqst4-original.glb",
+          "localPath": "public/assets/mint/desert-04/original_glb.glb",
+          "loaderHint": "gltf",
+          "byteSize": 890636,
+          "extensionsUsed": [],
+          "extensionsRequired": [],
+          "usesDraco": false,
+          "requiresDraco": false,
+          "usesMeshopt": false,
+          "requiresMeshopt": false,
+          "usesKtx2": false,
+          "requiresKtx2": false,
+          "unknownRequiredExtensions": []
+        },
+        "preview_image": {
+          "artifactId": "preview_image",
+          "role": "preview_image",
+          "format": "webp",
+          "contentType": "image/webp",
+          "filename": "desert-mesa-ridge-758cqst4-preview.webp",
+          "localPath": "public/assets/mint/desert-04/preview_image.webp",
+          "loaderHint": "image",
+          "byteSize": 37662
+        }
+      },
+      "thumbnailUrl": "public/assets/mint/desert-04/preview_image.webp"
+    },
+    "desert-05": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "model",
+        "assetId": "ks7f16x0pcxfvgghdeshsff1th8cq6zv"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "original_glb": {
+          "artifactId": "original_glb",
+          "role": "canonical_model",
+          "format": "glb",
+          "contentType": "model/gltf-binary",
+          "filename": "propellant-tank-farm-th8cq6zv-original.glb",
+          "localPath": "public/assets/mint/desert-05/original_glb.glb",
+          "loaderHint": "gltf",
+          "byteSize": 761044,
+          "extensionsUsed": [],
+          "extensionsRequired": [],
+          "usesDraco": false,
+          "requiresDraco": false,
+          "usesMeshopt": false,
+          "requiresMeshopt": false,
+          "usesKtx2": false,
+          "requiresKtx2": false,
+          "unknownRequiredExtensions": []
+        },
+        "preview_image": {
+          "artifactId": "preview_image",
+          "role": "preview_image",
+          "format": "webp",
+          "contentType": "image/webp",
+          "filename": "propellant-tank-farm-th8cq6zv-preview.webp",
+          "localPath": "public/assets/mint/desert-05/preview_image.webp",
+          "loaderHint": "image",
+          "byteSize": 57658
+        }
+      },
+      "thumbnailUrl": "public/assets/mint/desert-05/preview_image.webp"
+    },
+    "desert-06": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "model",
+        "assetId": "ks79v3wffpsm6s0dh3z2jsnrc18cqmys"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "original_glb": {
+          "artifactId": "original_glb",
+          "role": "canonical_model",
+          "format": "glb",
+          "contentType": "model/gltf-binary",
+          "filename": "perimeter-blast-berm-c18cqmys-original.glb",
+          "localPath": "public/assets/mint/desert-06/original_glb.glb",
+          "loaderHint": "gltf",
+          "byteSize": 749400,
+          "extensionsUsed": [],
+          "extensionsRequired": [],
+          "usesDraco": false,
+          "requiresDraco": false,
+          "usesMeshopt": false,
+          "requiresMeshopt": false,
+          "usesKtx2": false,
+          "requiresKtx2": false,
+          "unknownRequiredExtensions": []
+        },
+        "preview_image": {
+          "artifactId": "preview_image",
+          "role": "preview_image",
+          "format": "webp",
+          "contentType": "image/webp",
+          "filename": "perimeter-blast-berm-c18cqmys-preview.webp",
+          "localPath": "public/assets/mint/desert-06/preview_image.webp",
+          "loaderHint": "image",
+          "byteSize": 34736
+        }
+      },
+      "thumbnailUrl": "public/assets/mint/desert-06/preview_image.webp"
+    },
     "drive-core": {
       "source": {
         "manifestVersion": 1,
@@ -1042,6 +1390,64 @@
         }
       },
       "thumbnailUrl": "public/assets/mint/drive-core/preview_image.webp"
+    },
+    "launch-rocket": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "model",
+        "assetId": "ks7fvs8q0w5j98a1c4nq8bkf9h8bvwwn"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "original_glb": {
+          "artifactId": "original_glb",
+          "role": "canonical_model",
+          "format": "glb",
+          "contentType": "model/gltf-binary",
+          "filename": "brushed-steel-orbital-ascender-9h8bvwwn-original.glb",
+          "localPath": "public/assets/mint/launch-rocket/original_glb.glb",
+          "loaderHint": "gltf",
+          "byteSize": 719064,
+          "extensionsUsed": [],
+          "extensionsRequired": [],
+          "usesDraco": false,
+          "requiresDraco": false,
+          "usesMeshopt": false,
+          "requiresMeshopt": false,
+          "usesKtx2": false,
+          "requiresKtx2": false,
+          "unknownRequiredExtensions": []
+        },
+        "preview_image": {
+          "artifactId": "preview_image",
+          "role": "preview_image",
+          "format": "webp",
+          "contentType": "image/webp",
+          "filename": "brushed-steel-orbital-ascender-9h8bvwwn-preview.webp",
+          "localPath": "public/assets/mint/launch-rocket/preview_image.webp",
+          "loaderHint": "image",
+          "byteSize": 29796
+        }
+      },
+      "thumbnailUrl": "public/assets/mint/launch-rocket/preview_image.webp"
     },
     "ship-hull": {
       "source": {

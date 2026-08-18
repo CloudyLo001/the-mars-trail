@@ -47,6 +47,7 @@ import type {
 import { createSeededRandom } from '../utils/random';
 
 export * from './types';
+export { FLYABLE_WAYPOINTS, flightSequenceFor } from './content';
 export {
   LEGS,
   PROFESSIONS,
@@ -67,7 +68,7 @@ export {
   stationPrice,
   stationServices,
 } from './stations';
-export { hazardOptions, effectiveSeverity } from './hazards';
+export { hazardOptions, effectiveSeverity, flightGrade } from './hazards';
 export type { HazardOption, HazardOptionId, HazardResolution } from './hazards';
 export type { ScoreReport, ScoreLine } from './score';
 export type { StationService, CampOption, HarvestResult } from './stations';
@@ -359,10 +360,14 @@ export class MarsTrailSim {
     return hazardOptions(this.state, waypoint);
   }
 
-  resolveHazard(optionId: HazardOptionId): HazardResolution | null {
+  /**
+   * @param performance 0-1 flight result when the player flew this hazard.
+   *   Omitted, the `fly` option resolves on the same dice as burning through.
+   */
+  resolveHazard(optionId: HazardOptionId, performance?: number): HazardResolution | null {
     const waypoint = this.nextWaypoint();
     if (!waypoint) return null;
-    const resolution = resolveHazard(this.state, waypoint, optionId, this.rng);
+    const resolution = resolveHazard(this.state, waypoint, optionId, this.rng, performance);
     this.lastOutcomeText = resolution.detail;
 
     // A hazard can kill the run outright.

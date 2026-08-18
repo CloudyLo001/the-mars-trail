@@ -156,6 +156,54 @@ export const PALETTES: Record<string, ScenePalette> = {
     particleDensity: 1,
     body: { color: '#b2542a', rimColor: '#f0a76d', radius: 30, position: [12, -10] },
   },
+  // --- flight sequences ---------------------------------------------------
+
+  'launch-ascent': {
+    key: 'launch-ascent',
+    // Daylight at the pad, thinning toward black as the ship climbs. The
+    // FlightScene lerps these toward 'debris-belt' as altitude builds, which is
+    // what sells leaving the atmosphere.
+    skyTop: '#1d4f96',
+    skyMid: '#5fa4d8',
+    skyBottom: '#bcd9e8',
+    farLayer: '#7ba6c4',
+    midLayer: '#53748f',
+    nearLayer: '#33485c',
+    fog: '#8fb6d0',
+    fogNear: 60,
+    fogFar: 260,
+    sunColor: '#fff6e0',
+    sunIntensity: 4.6,
+    hemiSky: '#bcdcf5',
+    hemiGround: '#6d6350',
+    hemiIntensity: 2.6,
+    sunPosition: [10, 14, 8],
+    starDensity: 0,
+    particleColor: '#eaf3fb',
+    particleDensity: 0.5,
+  },
+
+  'mars-descent': {
+    key: 'mars-descent',
+    skyTop: '#3a1d1c',
+    skyMid: '#8a4526',
+    skyBottom: '#d0854a',
+    farLayer: '#a85f31',
+    midLayer: '#70401f',
+    nearLayer: '#3d2415',
+    fog: '#a15c30',
+    fogNear: 40,
+    fogFar: 200,
+    sunColor: '#ffd9a0',
+    sunIntensity: 3.6,
+    hemiSky: '#e0a06a',
+    hemiGround: '#3a2216',
+    hemiIntensity: 2.5,
+    sunPosition: [-8, 10, 6],
+    starDensity: 0.12,
+    particleColor: '#e3b184',
+    particleDensity: 1.1,
+  },
 };
 
 export function paletteFor(sceneKey: string): ScenePalette {

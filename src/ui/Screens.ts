@@ -1099,6 +1099,18 @@ export class Screens {
 
     this.settingGroup(
       card,
+      'Retro treatment',
+      'The original pixel-art look: a clamped palette, ordered dither, and scanlines. Off renders the scene cleanly with filmic tone mapping.',
+      [
+        { label: 'Off', value: false, detail: 'Modern. Default.' },
+        { label: 'On', value: true, detail: 'The authored pixel look.' },
+      ],
+      settings.retro,
+      (value) => this.callbacks.onChangeSettings({ retro: value }),
+    );
+
+    this.settingGroup(
+      card,
       'Retro filter',
       'Recolours the whole scene to a single-hue CRT phosphor green with scanlines.',
       [

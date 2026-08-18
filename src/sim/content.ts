@@ -501,4 +501,24 @@ export function professionById(id: ProfessionId): Profession {
   return found;
 }
 
+/**
+ * Waypoints the player can fly themselves instead of resolving with a card.
+ *
+ * Kept in the pure sim, next to the waypoints it names, so the simulation and
+ * the flight model agree on the set without either importing the other. The
+ * remaining hazards — the Van Allen Shear, the flare corridor, the Cosmic
+ * Deep, and orbital insertion — stay pure decision cards, so the pacing varies
+ * rather than every waypoint becoming a dodge sequence.
+ */
+export const FLYABLE_WAYPOINTS: Record<string, string> = {
+  'kessler-belt': 'kessler',
+  'rubble-shoal': 'asteroid-fringe',
+  'meteor-sleet': 'asteroid-fringe',
+  'ares-descent': 'mars-descent',
+};
+
+export function flightSequenceFor(waypointId: string): string | null {
+  return FLYABLE_WAYPOINTS[waypointId] ?? null;
+}
+
 export const TOTAL_MISSION_KM = LEGS.reduce((sum, leg) => sum + leg.baseKm, 0);

@@ -20,7 +20,7 @@ interface Strategy {
   /** Outfitting plan: item id -> number of purchase steps. */
   buy: Record<string, number>;
   /** Preferred hazard option, falling back down the list when unaffordable. */
-  hazardPreference: Array<'escort' | 'creep' | 'hold' | 'burn'>;
+  hazardPreference: Array<'escort' | 'creep' | 'hold' | 'burn' | 'fly'>;
   /** Take station services when affordable. */
   useStations: boolean;
 }
@@ -32,7 +32,7 @@ const STRATEGIES: Strategy[] = [
     burn: 'standard',
     rations: 'filling',
     buy: { driveCores: 5, rationsKg: 14, waterL: 12, propellantCells: 6, radSuits: 5, coolantPumps: 2, heatShield: 2, commsArray: 1, hullPlates: 2 },
-    hazardPreference: ['escort', 'creep', 'hold', 'burn'],
+    hazardPreference: ['escort', 'creep', 'hold', 'fly', 'burn'],
     useStations: true,
   },
   {
@@ -41,7 +41,7 @@ const STRATEGIES: Strategy[] = [
     burn: 'standard',
     rations: 'meager',
     buy: { driveCores: 4, rationsKg: 12, waterL: 10, propellantCells: 5, radSuits: 4, coolantPumps: 2, heatShield: 2, commsArray: 1, hullPlates: 1 },
-    hazardPreference: ['creep', 'escort', 'hold', 'burn'],
+    hazardPreference: ['creep', 'escort', 'hold', 'fly', 'burn'],
     useStations: true,
   },
   {
@@ -50,7 +50,7 @@ const STRATEGIES: Strategy[] = [
     burn: 'hard',
     rations: 'bare',
     buy: { driveCores: 3, rationsKg: 5, waterL: 6, propellantCells: 3, radSuits: 1, heatShield: 1 },
-    hazardPreference: ['burn', 'creep', 'hold', 'escort'],
+    hazardPreference: ['burn', 'fly', 'creep', 'hold', 'escort'],
     useStations: false,
   },
   {
@@ -59,7 +59,7 @@ const STRATEGIES: Strategy[] = [
     burn: 'hard',
     rations: 'bare',
     buy: { driveCores: 2, rationsKg: 6, waterL: 6, propellantCells: 2, radSuits: 0, heatShield: 1 },
-    hazardPreference: ['burn'],
+    hazardPreference: ['burn', 'fly'],
     useStations: false,
   },
 ];
@@ -151,7 +151,9 @@ function playRun(strategy: Strategy, seed: number): RunOutcome {
       }
       case 'hazard': {
         const options = sim.hazardOptions();
-        let picked = options.find((o) => o.id === 'burn');
+        // Fall back to whatever the waypoint actually offers, since `burn` is
+        // replaced by `fly` at flyable waypoints.
+        let picked = options.find((o) => o.id === 'burn') ?? options[0];
         for (const preference of strategy.hazardPreference) {
           const match = options.find((o) => o.id === preference && o.available);
           if (match) {
