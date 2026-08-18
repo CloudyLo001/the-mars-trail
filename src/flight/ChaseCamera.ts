@@ -18,8 +18,13 @@ const OFFSET = new THREE.Vector3(0, 1.35, 8.2);
 /** How far ahead of the ship the camera looks. */
 const LOOK_AHEAD = 16;
 
-/** Camera distance behind the vehicle while flying the ascent. */
-const FLYING_BACK = 5.4;
+/**
+ * Camera position while flying: mounted on top of the vehicle near the nose,
+ * so the tip is in shot at the bottom of the frame and everything above it is
+ * corridor. Sitting back behind the tail put the whole body in the way.
+ */
+const FLYING_BACK = 0.4;
+const FLYING_LIFT = 0.95;
 
 /** Camera distance while watching the liftoff from beside the pad. */
 const PAD_BACK = 15;
@@ -56,9 +61,9 @@ export class ChaseCamera {
    * Blend between the two launch framings.
    *
    * 1 is the pad shot: the camera stands off to the side at ground level and
-   * watches the vehicle climb away. 0 is the flying shot: tucked in close
-   * behind and just below, so only the aft end of the rocket sits in the
-   * bottom of the frame and the rest is sky.
+   * watches the vehicle climb away. 0 is the flying shot: mounted on top of the
+   * vehicle by the nose, so its tip sits low in the frame and the rest is
+   * corridor.
    */
   setLaunchFraming(padWeight: number): void {
     this.launchFraming = Math.max(0, Math.min(1, padWeight));
@@ -93,11 +98,12 @@ export class ChaseCamera {
     if (this.launchMode) {
       const w = this.launchFraming;
 
-      // Pad shot stands off to the side and below; the flying shot tucks in
-      // close behind and slightly under the vehicle.
+      // Pad shot stands off to the side and below. The flying shot sits on top
+      // of the vehicle near the nose, so its tip is in shot and the body is not
+      // in the way.
       this.target.set(
         view.shipX + w * 8.5,
-        view.shipY - 1.1 - w * 5.2,
+        view.shipY + (1 - w) * FLYING_LIFT - w * 6.3,
         FLYING_BACK + w * (PAD_BACK - FLYING_BACK),
       );
       // Lag hard during the pad shot so the rocket visibly pulls away from the
@@ -105,11 +111,11 @@ export class ChaseCamera {
       const follow = 1 - Math.exp(-(2.2 + (1 - w) * 7) * delta);
       this.camera.position.lerp(this.target, follow);
 
-      // On the pad the camera watches the vehicle; flying, it looks up the
-      // corridor past it, so the frame is sky and whatever is coming down it.
+      // Flying, look level from the nose mount so the tip sits low in frame and
+      // the corridor fills the rest; angled up at the vehicle on the pad.
       this.lookTarget.set(
         view.shipX * (1 - w * 0.4) + view.shipVX * 0.25 * (1 - w),
-        view.shipY + w * 2.5 + (1 - w) * 2.2,
+        view.shipY + (1 - w) * FLYING_LIFT + w * 3.4,
         w * -2 + (1 - w) * -LOOK_AHEAD,
       );
       this.camera.lookAt(this.lookTarget);

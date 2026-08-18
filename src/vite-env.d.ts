@@ -96,6 +96,8 @@ interface ThreeGameTestHooks {
   };
   /** Abandon the live sequence. */
   abortFlight(): void;
+  /** Step the live sequence forward without rendering, for fast coverage. */
+  fastForwardFlight(seconds: number): void;
   playToEnd(
     style: string,
     seed: number,

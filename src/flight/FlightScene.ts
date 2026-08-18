@@ -11,6 +11,7 @@
 
 import * as THREE from 'three';
 import { ChaseCamera } from './ChaseCamera';
+import { CloudLayer } from './CloudLayer';
 import { ObstacleField } from './ObstacleField';
 import { paletteFor, type ScenePalette } from '../scene/palettes';
 import type { FlightConfig, FlightRunView } from './model/types';
@@ -24,6 +25,9 @@ const STAR_COUNT = 600;
 /** How long the camera takes to swing from the pad shot to the flying shot. */
 const HANDOVER_SECONDS = 2;
 
+/** Reused rather than allocated per frame when tinting the cloud deck. */
+const WHITE = new THREE.Color('#ffffff');
+
 /**
  * Ascent sky, as flat opaque bands rather than a gradient.
  *
@@ -32,9 +36,9 @@ const HANDOVER_SECONDS = 2;
  * gradient would blend them into mush and lose that.
  */
 const ASCENT_SKY: Array<{ upTo: number; color: string; ground: string }> = [
-  { upTo: 0.14, color: '#b8d8ea', ground: '#c9a978' },
-  { upTo: 0.3, color: '#7fb4dc', ground: '#b89769' },
-  { upTo: 0.46, color: '#4a86c4', ground: '#9d7f57' },
+  { upTo: 0.14, color: '#5f93bb', ground: '#a8875c' },
+  { upTo: 0.3, color: '#427ba8', ground: '#8f7049' },
+  { upTo: 0.46, color: '#2f5f8e', ground: '#75593c' },
   { upTo: 0.62, color: '#2b5a97', ground: '#7d6446' },
   { upTo: 0.78, color: '#173463', ground: '#5a4832' },
   { upTo: 0.9, color: '#0a1733', ground: '#332a1e' },
@@ -50,6 +54,7 @@ export class FlightScene {
   readonly scene = new THREE.Scene();
   readonly chase = new ChaseCamera();
   readonly obstacles = new ObstacleField();
+  readonly clouds: CloudLayer;
 
   private readonly sun: THREE.DirectionalLight;
   private readonly hemi: THREE.HemisphereLight;
@@ -64,16 +69,17 @@ export class FlightScene {
   private readonly ground: THREE.Mesh;
   private readonly groundMaterial: THREE.MeshStandardMaterial;
 
-  private readonly plumeMaterial: THREE.MeshBasicMaterial;
-  private readonly plumes: THREE.Mesh[] = [];
-
   private palette: ScenePalette = paletteFor('debris-belt');
   private config: FlightConfig | null = null;
 
   /** The launch complex: pad, gantry, tanks, berm, and the mesa horizon. */
   private readonly padHost = new THREE.Group();
+  private readonly cloudTint = new THREE.Color('#ffffff');
 
   constructor(private readonly rng: () => number) {
+    this.clouds = new CloudLayer(rng);
+    this.scene.add(this.clouds.group);
+
     this.hemi = new THREE.HemisphereLight('#8fc7e8', '#123048', 2);
     this.scene.add(this.hemi);
 
@@ -126,22 +132,6 @@ export class FlightScene {
     this.ground.rotation.x = -Math.PI / 2;
     this.ground.visible = false;
     this.scene.add(this.ground);
-
-    // --- engine plumes ---------------------------------------------------
-    this.plumeMaterial = new THREE.MeshBasicMaterial({
-      color: '#9fe8ff',
-      transparent: true,
-      opacity: 0.75,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
-    for (let i = 0; i < 3; i += 1) {
-      const plume = new THREE.Mesh(new THREE.PlaneGeometry(0.42, 2.6), this.plumeMaterial);
-      plume.position.set((i - 1) * 0.38, -0.18, 1.6);
-      plume.rotation.x = Math.PI / 2;
-      this.plumes.push(plume);
-      this.shipHost.add(plume);
-    }
   }
 
   /**
@@ -155,7 +145,9 @@ export class FlightScene {
   setShipModel(model: THREE.Object3D): void {
     if (this.shipModel) this.shipHost.remove(this.shipModel);
     this.shipModel = model;
-    model.rotation.set(0, Math.PI, 0);
+    // Nose along the corridor by default. The launch overrides this each frame
+    // so the vehicle can stand upright on the pad and pitch over on handover.
+    model.rotation.set(-Math.PI / 2, 0, 0);
     this.shipHost.add(model);
   }
 
@@ -170,6 +162,7 @@ export class FlightScene {
     this.palette = paletteFor(config.sceneKey);
     this.applyPalette(this.palette);
     this.obstacles.populate(props, config.capacity, this.rng);
+    this.clouds.reset(this.rng, config.spawnDepth);
     this.chase.reset();
 
     const grounded = config.id === 'launch' || config.id === 'mars-descent';
@@ -180,6 +173,12 @@ export class FlightScene {
 
     this.clearPad();
     if (config.id === 'launch') this.buildPad(padProps);
+  }
+
+  /** Replace the obstacle models once their family has streamed in. */
+  rebuildObstacles(props: THREE.Object3D[]): void {
+    if (!this.config || props.length === 0) return;
+    this.obstacles.populate(props, this.config.capacity, this.rng);
   }
 
   /** Replace the launch complex once its assets have streamed in. */
@@ -198,19 +197,29 @@ export class FlightScene {
   private buildPad(props: THREE.Object3D[]): void {
     if (props.length === 0) return;
 
-    // [pad, gantry, ground tile, mesa ridge, tanks, berm] in generation order.
+    // desert-01..06 in key order. Index 2 is the tileable ground slab and is
+    // deliberately unused: the scene already has a ground plane, and dropping a
+    // second slab in leaves a plate hanging in the sky.
+    const PAD = 0;
+    const GANTRY = 1;
+    const MESA = 3;
+    const TANKS = 4;
+    const BERM = 5;
+
     const layout: Array<{ index: number; pos: [number, number, number]; scale: number; rotY?: number }> = [
-      { index: 0, pos: [0, -5.6, 0], scale: 4.5 },
-      { index: 1, pos: [-6.5, -3.4, -1], scale: 5.5 },
-      { index: 4, pos: [13, -5, -14], scale: 4 },
-      { index: 5, pos: [-15, -5.2, -22], scale: 6, rotY: 0.2 },
-      { index: 3, pos: [0, -6, -150], scale: 46 },
-      { index: 3, pos: [-90, -6, -190], scale: 52, rotY: 0.6 },
-      { index: 3, pos: [95, -6, -175], scale: 44, rotY: -0.4 },
+      { index: PAD, pos: [0, -5.6, 0], scale: 4.5 },
+      { index: GANTRY, pos: [-6.5, -3.4, -1], scale: 5.5 },
+      { index: TANKS, pos: [13, -5, -14], scale: 4 },
+      { index: BERM, pos: [-15, -5.2, -22], scale: 6, rotY: 0.2 },
+      { index: MESA, pos: [0, -6, -150], scale: 46 },
+      { index: MESA, pos: [-90, -6, -190], scale: 52, rotY: 0.6 },
+      { index: MESA, pos: [95, -6, -175], scale: 44, rotY: -0.4 },
     ];
 
     for (const entry of layout) {
-      const source = props[entry.index] ?? props[props.length - 1];
+      // No fallback: a missing slot leaves that piece out rather than standing
+      // the wrong model in its place.
+      const source = props[entry.index];
       if (!source) continue;
       const object = source.clone(true);
       object.position.set(...entry.pos);
@@ -287,9 +296,22 @@ export class FlightScene {
         this.shipModel.rotation.x = -Math.PI / 2 + padWeight * (Math.PI / 2);
       }
 
+      // The cloud deck is the first thing you fly through: thick as you leave
+      // the pad, thinning to nothing by the time the debris arrives. It is
+      // scenery, so it spreads far wider than the corridor and simply washes
+      // over you rather than being something to avoid.
+      // Nothing at ground level: the pad, gantry and desert have to read
+      // cleanly before the deck arrives. It builds once you are climbing and
+      // thins out again above the weather.
+      const deck =
+        climbed < 0.09 ? 0 : Math.max(0, Math.min(1, 1 - Math.abs(climbed - 0.26) / 0.19));
+      this.cloudTint.set(band.color).lerp(WHITE, 0.72);
+      this.clouds.update(delta, view.speed * 1.25, deck, this.cloudTint);
+
       this.chase.setLaunchFraming(padWeight);
     } else if (config.id === 'mars-descent') {
       this.chase.clearLaunchFraming();
+      this.clouds.update(delta, view.speed, 0, this.cloudTint);
       // The surface rises to meet you.
       this.ground.position.y = -150 + view.progress * 142;
     }
@@ -305,12 +327,6 @@ export class FlightScene {
       this.shipModel.visible = !view.invulnerable || Math.floor(view.seconds * 18) % 2 === 0;
     }
 
-    const throttle = boosting ? 1 : 0.62;
-    for (let i = 0; i < this.plumes.length; i += 1) {
-      const flicker = 0.85 + Math.sin(view.seconds * 26 + i * 2.2) * 0.15;
-      this.plumes[i].scale.set(1, throttle * flicker * (config.id === 'launch' ? 1.7 : 1), 1);
-    }
-    this.plumeMaterial.opacity = 0.4 + throttle * 0.45;
 
     this.obstacles.syncFrom(view.bodies);
 
@@ -328,11 +344,10 @@ export class FlightScene {
 
   dispose(): void {
     this.obstacles.dispose();
+    this.clouds.dispose();
     this.starMaterial.dispose();
     this.stars.geometry.dispose();
     this.groundMaterial.dispose();
     this.ground.geometry.dispose();
-    this.plumeMaterial.dispose();
-    for (const plume of this.plumes) plume.geometry.dispose();
   }
 }

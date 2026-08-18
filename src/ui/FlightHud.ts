@@ -38,7 +38,17 @@ export class FlightHud {
       this.hits.style.color = view.hits >= 4 ? 'var(--red)' : view.hits > 0 ? 'var(--amber)' : '';
     }
 
+    // With the camera on the nose there is no horizon to judge the lane
+    // against, so the warning has to say which way back.
     this.warning.hidden = !view.offCorridor;
+    if (view.offCorridor) {
+      const arrows: string[] = [];
+      if (view.driftX > 0) arrows.push('◀');
+      if (view.driftX < 0) arrows.push('▶');
+      if (view.driftY > 0) arrows.push('▼');
+      if (view.driftY < 0) arrows.push('▲');
+      this.warning.textContent = `${arrows.join(' ')} OFF CORRIDOR ${arrows.join(' ')}`;
+    }
   }
 
   private element(selector: string): HTMLElement {

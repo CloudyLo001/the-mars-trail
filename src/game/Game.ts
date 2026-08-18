@@ -135,12 +135,15 @@ export class Game {
         }
         this.audio.play('ui-confirm');
         this.audio.startAmbience();
-        // Wait for the launch complex and the debris field before starting.
-        // Both are small, the outfitting screen has already given them time,
-        // and beginning the ascent over an empty desert then popping the pad in
-        // a second later looks worse than a brief pause here.
+        // Start flying immediately. Blocking departure on the asset stream left
+        // the player staring at the outfitting screen for as long as ten
+        // seconds with no feedback; the pad simply builds itself a beat later.
+        this.startLaunch();
         void this.assets.ensureFamilies(['desert', 'asteroid']).then(() => {
-          this.startLaunch();
+          if (this.flight?.sequence === 'launch') {
+            this.flight.setPadProps(this.assets.desert);
+            this.flight.setObstacleProps(this.assets.asteroids);
+          }
         });
       },
       onChooseRoute: (routeId) => {
@@ -303,7 +306,10 @@ export class Game {
       this.bootStatus.hidden = true;
     }
 
-    if (this.assets.hull) this.scene.ship.setHullModel(this.assets.hull);
+    // One vehicle throughout: the ascender you launch in is the ship you fly
+    // the whole crossing in, rather than swapping to a different hull offscreen.
+    const hull = this.assets.rocket ?? this.assets.hull;
+    if (hull) this.scene.ship.setHullModel(hull);
     if (this.assets.core) this.scene.ship.setCoreModel(this.assets.core);
     this.audio.registerUrls(this.assets.audioUrls);
     // Portraits resolved after the HUD's first paint, so the cached crew cards
@@ -354,20 +360,16 @@ export class Game {
    */
   private startLaunch(): void {
     this.beginFlight('launch', (result) => {
-      if (result.performance < 0.3) {
-        this.showOutcome(
-          'ABORT TO PAD',
-          'You never cleared the tower cleanly. The vehicle is recovered, the pad is reset, and nothing is lost but the morning. Fly it again.',
-          true,
-          () => this.startLaunch(),
-        );
-        return;
-      }
+      // The ascent cannot fail. It is the first thing a new run touches, it is
+      // the tutorial for the controls, and being bounced back to the pad after
+      // ten minutes of outfitting is the most discouraging thing this game
+      // could do. Performance only decides the flavour of the arrival.
+      const clean = result.performance > 0.7;
       this.showOutcome(
         'ORBIT ACHIEVED',
-        result.performance > 0.75
+        clean
           ? 'A clean ascent. The tower falls away, the sky goes black, and Mars is two hundred and twenty-five million kilometres ahead.'
-          : 'Rough, but you are up. The sky goes black and the real crossing begins.',
+          : 'Rough, and the hull has the scars to prove it — but you are up. The sky goes black and the real crossing begins.',
         false,
       );
     });
@@ -409,7 +411,7 @@ export class Game {
       // other sequence flies the transit hull through open space.
       sequence === 'launch' ? this.assets.desert : [],
     );
-    const vehicle = sequence === 'launch' ? (this.assets.rocket ?? this.assets.hull) : this.assets.hull;
+    const vehicle = this.assets.rocket ?? this.assets.hull;
     if (vehicle) this.flight.setShipModel(vehicle.clone(true));
 
     this.pipeline.setSceneAndCamera(this.flight.scene.scene, this.flight.scene.chase.camera);
@@ -792,6 +794,9 @@ export class Game {
       },
       abortFlight: () => {
         this.flight?.abort();
+      },
+      fastForwardFlight: (seconds: number) => {
+        this.flight?.fastForward(seconds);
       },
       playToEnd: (style: string, seed: number) => {
         this.tutorialOpen = false;

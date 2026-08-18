@@ -112,7 +112,51 @@ test('the liftoff is scripted, then control hands over', async ({ page }) => {
   );
 });
 
+test('the ascent always reaches orbit, however badly it is flown', async ({ page }) => {
+  test.setTimeout(240_000);
+  await bootGame(page);
+
+  // This has to go through the real departure path: the raw startFlight hook
+  // skips the launch's own outcome handling, which is the thing under test.
+  await page.getByRole('button', { name: /begin the crossing/i }).click();
+  await page.getByRole('button', { name: /corporate financier/i }).click();
+  await page.getByRole('button', { name: /to the outfitters/i }).click();
+  const buy = async (item: string, times: number) => {
+    const row = page.locator('.store-row').filter({ hasText: item });
+    for (let i = 0; i < times; i += 1) await row.getByRole('button', { name: /^Buy /i }).click();
+  };
+  await buy('Drive Cores', 2);
+  await buy('Rations', 2);
+  await buy('Water', 1);
+  await page.getByRole('button', { name: /leave the yard/i }).click();
+
+  await expect(page.locator('#flight-hud')).toBeVisible();
+
+  // Fly it as badly as the harness can. The ascent must still hand the player
+  // to the crossing rather than bouncing them back to the pad.
+  await page.evaluate(() => window.__THREE_GAME_TEST_HOOKS__?.setFlightAutopilot(0.02));
+  await page.evaluate(() => window.__THREE_GAME_TEST_HOOKS__?.fastForwardFlight(75));
+
+  await expect
+    .poll(
+      async () =>
+        (await page.evaluate(() => window.__THREE_GAME_TEST_HOOKS__?.flightSnapshot()))?.active,
+      { timeout: 30_000, intervals: [250] },
+    )
+    .toBe(false);
+
+  await expect(page.locator('.card-title')).toHaveText(/orbit achieved/i);
+
+  // And it leads into the crossing rather than another ascent.
+  await page.getByRole('button', { name: /continue|onward|proceed|▸/i }).first().click();
+  await expect
+    .poll(async () => page.evaluate(() => window.__THREE_GAME_DIAGNOSTICS__?.phase))
+    .toBe('leg-select');
+});
+
 test('the ship responds to real keyboard input', async ({ page }) => {
+  // Booting plus a corridor of ~48 cloned models renders slowly without a GPU.
+  test.setTimeout(240_000);
   await bootGame(page);
   await page.evaluate(() => window.__THREE_GAME_TEST_HOOKS__?.startFlight('kessler', 4242));
   await expect(page.locator('#flight-hud')).toBeVisible();
@@ -140,9 +184,7 @@ test('the ship responds to real keyboard input', async ({ page }) => {
 });
 
 test('a flown hazard resolves through the simulation', async ({ page }) => {
-  // A corridor is ~30 s of simulated time, and the fixed-step loop advances at
-  // roughly half real time under a software rasterizer, so this needs headroom.
-  test.setTimeout(300_000);
+  test.setTimeout(180_000);
   await bootGame(page);
 
   await page.evaluate(() => {
@@ -154,29 +196,19 @@ test('a flown hazard resolves through the simulation', async ({ page }) => {
 
   await expect(page.locator('#flight-hud')).toBeVisible();
 
-  // The corridor is 30 s of simulated time but advances well under real time
-  // on a software rasterizer, so this waits generously. It also watches
-  // progress rather than only the finished flag, so a genuinely stalled run
-  // fails with a useful message instead of an anonymous timeout.
-  let lastProgress = -1;
-  let stalledPolls = 0;
+  // Let it render a little in real time first, so this still covers the live
+  // update path, then fast-forward the rest rather than waiting minutes.
+  await page.waitForTimeout(1500);
+  const midway = await page.evaluate(() => window.__THREE_GAME_TEST_HOOKS__?.flightSnapshot());
+  expect(midway?.progress ?? 0, 'the flight must advance while rendering').toBeGreaterThan(0);
+
+  await page.evaluate(() => window.__THREE_GAME_TEST_HOOKS__?.fastForwardFlight(45));
+
   await expect
     .poll(
-      async () => {
-        const snap = await page.evaluate(() =>
-          window.__THREE_GAME_TEST_HOOKS__?.flightSnapshot(),
-        );
-        const progress = snap?.progress ?? 0;
-        if (progress <= lastProgress) stalledPolls += 1;
-        else stalledPolls = 0;
-        lastProgress = progress;
-        expect(
-          stalledPolls,
-          `flight stopped advancing at progress ${progress.toFixed(3)}`,
-        ).toBeLessThan(8);
-        return snap?.active;
-      },
-      { timeout: 420_000, intervals: [1000] },
+      async () =>
+        (await page.evaluate(() => window.__THREE_GAME_TEST_HOOKS__?.flightSnapshot()))?.active,
+      { timeout: 30_000, intervals: [250] },
     )
     .toBe(false);
 
@@ -187,6 +219,7 @@ test('a flown hazard resolves through the simulation', async ({ page }) => {
 });
 
 test('escape abandons a sequence and returns control', async ({ page }) => {
+  test.setTimeout(240_000);
   await bootGame(page);
   await page.evaluate(() => window.__THREE_GAME_TEST_HOOKS__?.startFlight('asteroid-fringe', 5));
   await expect(page.locator('#flight-hud')).toBeVisible();

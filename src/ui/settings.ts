@@ -8,7 +8,9 @@
 
 // Bumped when the defaults changed: a stored 270 is still a valid preset, so
 // without a new key every returning player would stay on the old pixel look.
-const STORAGE_KEY = 'mars-trail:display-settings:v2';
+// Bumped again when the default rose to 1080p: a stored 540 is still a valid
+// preset, so without a new key returning players would stay on the old default.
+const STORAGE_KEY = 'mars-trail:display-settings:v3';
 
 export interface DisplaySettings {
   /** Internal render height in pixels. Lower is chunkier. */
@@ -28,15 +30,19 @@ export interface SettingOption<T> {
 }
 
 /**
- * Internal render resolution. 540 is the default: high enough that the
- * generated models read as models rather than sprites, while still rendering
- * offscreen so the retro treatment remains available.
+ * Internal render resolution.
+ *
+ * 1080 is the default. The scene still renders into an offscreen buffer rather
+ * than straight to the canvas, so the retro treatment stays available — it is
+ * just no longer downscaled. Every lower preset is kept, because 1080p with a
+ * bloom pass and a corridor of cloned models is genuinely expensive on weaker
+ * hardware and dropping to HD halves the pixel cost.
  */
 export const PIXELATION_OPTIONS: Array<SettingOption<number>> = [
-  { label: 'Chunky', value: 270, detail: 'The original pixel look.' },
+  { label: 'Chunky', value: 270, detail: 'The original pixel look. Cheapest to draw.' },
   { label: 'Sharp', value: 405, detail: 'Coarse grain, models read clearly.' },
-  { label: 'HD', value: 540, detail: 'Default. Clean and detailed.' },
-  { label: 'Ultra', value: 810, detail: 'Highest detail. Costs the most to draw.' },
+  { label: 'HD', value: 540, detail: 'Clean and detailed. Half the cost of Full.' },
+  { label: 'Full', value: 1080, detail: 'Default. Sharpest, and the most to draw.' },
 ];
 
 export const BRIGHTNESS_OPTIONS: Array<SettingOption<number>> = [
@@ -47,7 +53,7 @@ export const BRIGHTNESS_OPTIONS: Array<SettingOption<number>> = [
 ];
 
 export const DEFAULT_SETTINGS: DisplaySettings = {
-  internalHeight: 540,
+  internalHeight: 1080,
   exposure: 1.6,
   phosphor: false,
   retro: false,

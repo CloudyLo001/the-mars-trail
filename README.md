@@ -67,10 +67,28 @@ The ascent runs about **60 seconds** in three beats:
 2. **Handover (~2 s).** The camera swings under and behind the vehicle while the rocket
    **pitches over** into its own line of travel — a gravity turn. Control arrives as a move
    rather than a cut.
-3. **The climb (~50 s).** Tucked in close behind the rocket looking up the corridor: only its aft
-   end sits in the bottom of the frame and the rest is sky and whatever is coming down it. The
-   ground is gone entirely — with no horizon there is no cue that you are flying anything but
-   straight up.
+3. **The cloud deck (~15 s).** Nothing to avoid yet: a bank of cloud spread far wider than the
+   flight corridor washes over you as you climb through it and thins out above. The puffs are
+   billboards that fade as they reach you, so flying through one is a soft whiteout rather than
+   clipping through a solid mesh.
+4. **The climb (~35 s).** Above the weather the debris starts arriving. The camera is mounted on
+   top of the vehicle by the nose, so its tip sits low in the frame and everything above it is
+   corridor. The ground is gone entirely — with no horizon there is no cue that you are flying
+   anything but straight up.
+
+Obstacles scatter roughly three times wider than the corridor so they fill the whole frame
+rather than forming a column up the middle, at roughly double the count so wider spacing does
+not mean an empty screen. The distribution is still weighted toward the centre, but only
+mildly — every rock on screen is real and can be hit.
+
+The clouds are billboards rather than meshes on purpose: a solid low-poly cloud shows you its
+interior the moment you fly into one. They fade as they reach the camera instead.
+
+The vehicle is deliberately durable. Its damage budget is roughly triple what it started at and
+the intangibility window after a hit is just over a second, so a scrape costs you a little score
+rather than the sequence. Skill still separates a good pilot from a bad one — see the spread
+assertions in `tests/flight.model.ts` — but by a smaller margin than when two hits could end a
+run.
 
 Steer with **WASD or the mouse**, **Shift** to boost, **Escape** to abandon.
 
@@ -83,9 +101,11 @@ descent. At those, **"Fly it yourself"** replaces "burn straight through" in the
 paying for a tug, creeping on thrusters, and holding for a window all remain. How well you fly
 decides clean / setback / disaster instead of a dice roll, feeding the same consequences.
 
-A botched **launch** costs nothing but the morning — you reset to the pad and go again. It is a
-skill gate and the de facto tutorial. A botched **hazard** costs exactly what a bad dice roll
-would have.
+The **launch cannot fail.** However badly you fly it you reach orbit; performance only decides
+whether the ship arrives clean or scarred. It is the first thing a new run touches and the
+tutorial for the controls, so being sent back to the pad after ten minutes of outfitting was the
+most discouraging thing the game could do. A botched **hazard**, later, still costs exactly what
+a bad dice roll would have.
 
 | Sequence | Character |
 | --- | --- |
@@ -126,14 +146,15 @@ presentation, never the simulation, so it is safe to open mid-run.
 
 | Setting | Options |
 | --- | --- |
-| **Pixelation** | Chunky (180p) · **Classic (270p, default)** · Sharp (405p) · HD (540p) |
+| **Pixelation** | Chunky (270p) · Sharp (405p) · HD (540p) · **Full (1080p, default)** |
 | **Brightness** | Dim · **Normal** · Bright · Brightest |
 | **Retro filter** | Off · On (monochrome CRT green) |
 
-Classic stays the default: 270p is the resolution the palette clamp, 4×4 dither grid, and 2px
-scanlines were tuned against. Higher settings keep the same treatment and simply resolve more
-detail in the generated models. Choices persist in `localStorage` and fall back to defaults if
-a stored preset no longer exists.
+**Full (1080p) is the default.** The scene still renders into an offscreen buffer rather than
+straight to the canvas, so the retro treatment stays available — it is just no longer
+downscaled. Every lower preset is kept: 1080p with a bloom pass and a corridor of cloned models
+is genuinely expensive on weaker hardware, and dropping to HD quarters the pixel cost. Choices
+persist in `localStorage` and fall back to the default if a stored preset no longer exists.
 
 ### Travel direction
 

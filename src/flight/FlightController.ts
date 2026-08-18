@@ -67,6 +67,29 @@ export class FlightController {
     this.scene.rebuildPad(props);
   }
 
+  /** Swap in the obstacle models once their family has streamed in. */
+  setObstacleProps(props: THREE.Object3D[]): void {
+    this.scene.rebuildObstacles(props);
+  }
+
+  /**
+   * Step the simulation without rendering.
+   *
+   * Test-only: a corridor is up to a minute long and runs well under real time
+   * without a GPU, which made browser coverage of a whole sequence take
+   * minutes. The scripted pilot flies it; nothing here bypasses a rule.
+   */
+  fastForward(seconds: number): void {
+    const steps = Math.min(120 * 200, Math.round(seconds / FIXED_STEP));
+    for (let i = 0; i < steps && !this.run.finished; i += 1) {
+      const axes = this.scripted
+        ? { ...this.scripted.sample(FIXED_STEP, this.run.view), abortRequested: false }
+        : { x: 0, y: 0, boost: false, brake: false, abortRequested: false };
+      this.run.step(FIXED_STEP, axes);
+    }
+    if (this.run.finished) this.settle();
+  }
+
   setShipModel(model: THREE.Object3D): void {
     this.scene.setShipModel(model);
   }

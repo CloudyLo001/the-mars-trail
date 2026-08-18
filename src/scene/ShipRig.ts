@@ -11,10 +11,12 @@
 import * as THREE from 'three';
 
 /** Spacing between drive cores along the tow line. */
-const CORE_SPACING = 1.35;
+const CORE_SPACING = 1.5;
 
 /** Where the hull sits in world space. */
-const HULL_POSITION = new THREE.Vector3(3.6, -3.1, 0);
+// Pushed back from the drive cores: the ascender hull is long once laid on its
+// side, and at the old offset its nose sat on top of the nearest core.
+const HULL_POSITION = new THREE.Vector3(5.4, -3.1, 0);
 
 export class ShipRig {
   readonly group = new THREE.Group();
@@ -53,6 +55,10 @@ export class ShipRig {
   /** Install the generated hull. Replaces any previous model. */
   setHullModel(model: THREE.Object3D): void {
     if (this.hullModel) this.hullHost.remove(this.hullModel);
+    // The ascender is modelled nose-up for the pad. In the travel view it is
+    // coasting, so lay it on its side with the nose pointing the way it is
+    // going — otherwise it flies broadside across the whole crossing.
+    model.rotation.set(0, 0, Math.PI / 2);
     this.hullModel = model;
     this.hullHost.add(model);
     this.buildPlumes();
@@ -92,7 +98,7 @@ export class ShipRig {
     for (let i = 0; i < clamped; i += 1) {
       const instance = this.coreModel.clone(true);
       instance.position.set(
-        HULL_POSITION.x - 2.3 - i * CORE_SPACING,
+        HULL_POSITION.x - 4.4 - i * CORE_SPACING,
         HULL_POSITION.y + 0.15,
         // Alternate slightly in depth so a long team reads as a team, not a wall.
         (i % 2 === 0 ? 0.22 : -0.22),
@@ -113,7 +119,10 @@ export class ShipRig {
     for (let i = 0; i < 4; i += 1) {
       const plume = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 0.28), this.plumeMaterial);
       plume.position.set(
-        HULL_POSITION.x + 1.55,
+        // The ascender is fitted to 4.2 units long, so its tail sits about 2.1
+        // behind the hull centre. At the old offset the quads were buried in
+        // the body with only their tips showing past the nose.
+        HULL_POSITION.x + 2.95,
         HULL_POSITION.y - 0.35 + i * 0.24,
         0.05 + i * 0.01,
       );

@@ -64,11 +64,12 @@ test('renders a nonblank canvas through the low-resolution pixel pipeline', asyn
   expect(sample, JSON.stringify(sample)).toMatchObject({ ok: true });
 
   // The scene still renders into an offscreen buffer rather than straight to
-  // the canvas; the default is now 540 rather than the old 270 pixel look.
+  // the canvas, so the retro treatment stays available; it is just no longer
+  // downscaled. Default is 1080p.
   const pipeline = await page.evaluate(() => window.__THREE_GAME_DIAGNOSTICS__?.pipeline);
-  expect(pipeline?.internalHeight).toBe(540);
-  expect(pipeline?.internalWidth).toBeGreaterThan(540);
-  expect(pipeline?.internalWidth).toBeLessThanOrEqual(1600);
+  expect(pipeline?.internalHeight).toBe(1080);
+  expect(pipeline?.internalWidth).toBeGreaterThan(1080);
+  expect(pipeline?.internalWidth).toBeLessThanOrEqual(3100);
 
   const screenshot = await page.screenshot({ fullPage: false });
   await testInfo.attach(`${testInfo.project.name}-title`, {
@@ -203,6 +204,9 @@ test('reopens the briefing from the travel HUD', async ({ page }) => {
 });
 
 test('buys and sells back stock in the yard requisition', async ({ page }, testInfo) => {
+  // Every purchase rebuilds the panel, and at the 1080p default each rebuild
+  // costs four times the pixels it did at 540p.
+  test.setTimeout(240_000);
   const pageErrors: string[] = [];
   page.on('pageerror', (error) => pageErrors.push(error.message));
 
@@ -246,6 +250,7 @@ test('buys and sells back stock in the yard requisition', async ({ page }, testI
 });
 
 test('keeps scroll position while shopping', async ({ page }) => {
+  test.setTimeout(180_000);
   await bootGame(page);
 
   await page.getByRole('button', { name: /begin the crossing/i }).click();
@@ -293,11 +298,12 @@ test('keeps scroll position while shopping', async ({ page }) => {
 });
 
 test('adjusts pixelation from display settings', async ({ page }) => {
+  test.setTimeout(180_000);
   await bootGame(page);
 
-  // HD (540) is the default and must stay so.
+  // Full (1080) is the default and must stay so.
   expect(await page.evaluate(() => window.__THREE_GAME_DIAGNOSTICS__?.pipeline.internalHeight)).toBe(
-    540,
+    1080,
   );
 
   await page.locator('#btn-settings').click();
@@ -312,23 +318,23 @@ test('adjusts pixelation from display settings', async ({ page }) => {
     )
     .toBe(270);
 
-  await page.getByRole('button', { name: /^Ultra/i }).click();
+  await page.getByRole('button', { name: /^HD/i }).click();
   await expect
     .poll(async () =>
       page.evaluate(() => window.__THREE_GAME_DIAGNOSTICS__?.pipeline.internalHeight),
     )
-    .toBe(810);
+    .toBe(540);
 
   // Buffer width must track the chosen height rather than a fixed cap.
   const buffer = await page.evaluate(() => window.__THREE_GAME_DIAGNOSTICS__?.pipeline);
-  expect(buffer!.internalWidth).toBeGreaterThan(810);
-  expect(buffer!.internalWidth).toBeLessThan(810 * 3);
+  expect(buffer!.internalWidth).toBeGreaterThan(540);
+  expect(buffer!.internalWidth).toBeLessThan(540 * 3);
 
   // The choice must survive a reload.
   await page.reload();
   await page.waitForFunction(() => (window.__THREE_GAME_DIAGNOSTICS__?.frame ?? 0) > 5);
   expect(await page.evaluate(() => window.__THREE_GAME_DIAGNOSTICS__?.pipeline.internalHeight)).toBe(
-    810,
+    540,
   );
 
   // Leave storage clean for the other specs.

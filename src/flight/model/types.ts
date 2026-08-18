@@ -66,9 +66,22 @@ export interface FlightConfig {
   capacity: number;
   /** Obstacle radius range. */
   radius: [number, number];
-  /** Soft corridor half-extents. */
+  /** Soft corridor half-extents. Where steering is pushed back. */
   corridorX: number;
   corridorY: number;
+  /**
+   * How far obstacles are scattered, as a multiple of the corridor.
+   *
+   * Spawning only inside the corridor leaves everything clustered in the middle
+   * of the frame with bare sky either side. Scattering wider fills the screen;
+   * the ones beyond the corridor are effectively scenery you can still clip.
+   */
+  spreadFactor?: number;
+  /**
+   * Progress, 0-1, before which no obstacle spawns. The ascent uses this to
+   * open with a cloud deck and only bring the debris in once you are above it.
+   */
+  clearUntil?: number;
   /** How much accumulated hit severity equals a total loss of performance. */
   hitBudget: number;
   /** Lateral acceleration. Higher is twitchier. */
@@ -91,6 +104,9 @@ export interface FlightRunView {
   invulnerable: boolean;
   /** True while outside the soft corridor bounds. */
   offCorridor: boolean;
+  /** -1 / 0 / 1 for which side of the lane the ship has drifted off. */
+  driftX: number;
+  driftY: number;
   /** True during the scripted opening, before control hands over. */
   cinematic: boolean;
   /** 0-1 through the scripted opening. 1 once the player has control. */

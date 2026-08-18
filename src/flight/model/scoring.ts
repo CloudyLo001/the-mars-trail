@@ -15,7 +15,11 @@ const ABORT_PENALTY = 0.35;
 
 export function scoreFlight(stats: FlightStats, config: FlightConfig): FlightRunResult {
   const damage = stats.hitSeverity / config.hitBudget;
-  const drift = stats.offCorridorSeconds * 0.06;
+  // Drifting out used to be brutal: at 0.06 a second, seventeen seconds
+  // outside the lane zeroed a run. With the camera mounted on the nose there is
+  // no horizon to judge the lane against, so this is now a nudge, not a
+  // sentence — the spring that pushes you back does the real work.
+  const drift = stats.offCorridorSeconds * 0.012;
 
   // Grazes are reported but deliberately NOT scored. They were originally a
   // bonus for threading gaps tightly, but the headless harness showed the

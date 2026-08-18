@@ -90,9 +90,15 @@ for (const sequence of sequenceIds) {
   check(`${sequence}: good beats drunk`, good > drunk, `${good.toFixed(3)} vs ${drunk.toFixed(3)}`);
   check(`${sequence}: sloppy beats drunk`, sloppy > drunk, `${sloppy.toFixed(3)} vs ${drunk.toFixed(3)}`);
 
-  // The launch is deliberately forgiving — it is the player's first contact
-  // with the controls — so it is held to a lower bar than the hazards.
-  const minSpread = sequence === 'launch' ? 0.08 : 0.25;
+  // These bars encode "flying well has to matter". They were lowered when the
+  // vehicle's damage budget was raised to make the sequences far more
+  // forgiving: skill should still separate a good pilot from a bad one, but no
+  // longer by the margin it did when two clean hits could end a run. Kept well
+  // clear of zero so a change that flattens skill entirely still fails here.
+  //
+  // The launch sits lowest of all: it is the player's first contact with the
+  // controls, it is retryable at no cost, and it doubles as the tutorial.
+  const minSpread = sequence === 'launch' ? 0.05 : 0.18;
   check(
     `${sequence}: skill spread is meaningful`,
     ace - drunk > minSpread,

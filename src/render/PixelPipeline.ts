@@ -19,7 +19,7 @@ import { RetroShader } from './RetroShader';
  * dither grid, and 2px scanlines were tuned against; the player can raise it
  * for a sharper picture through display settings.
  */
-const DEFAULT_INTERNAL_HEIGHT = 540;
+const DEFAULT_INTERNAL_HEIGHT = 1080;
 
 /** Buffer height the retro treatment was authored against. */
 const RETRO_REFERENCE_HEIGHT = 270;

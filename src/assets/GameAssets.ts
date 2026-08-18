@@ -129,13 +129,23 @@ export class GameAssets {
             ? this.desert
             : this.stations;
 
+    // Write each model into the slot matching its key, not the order it
+    // happens to finish downloading in. Pushing on completion made the array
+    // order a race, and the launch pad lays its complex out by index — so the
+    // ground tile could end up in the gantry's slot and hang in the sky.
+    const keys = assetKeysWithPrefix(`${family}-`);
+    const slots: Array<THREE.Object3D | null> = keys.map(() => null);
+
     const job = Promise.all(
-      assetKeysWithPrefix(`${family}-`).map((key) =>
+      keys.map((key, index) =>
         this.loadInto(key, FAMILY_FIT[family], report, (object) => {
-          target.push(object);
+          slots[index] = object;
         }),
       ),
-    ).then(() => undefined);
+    ).then(() => {
+      target.length = 0;
+      for (const slot of slots) if (slot) target.push(slot);
+    });
 
     this.familyLoads.set(family, job);
     return job;

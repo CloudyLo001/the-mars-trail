@@ -32,13 +32,25 @@ const SHIP_RADIUS = 0.55;
  * hit on every one of the 120 steps per second it overlaps, and one clumsy
  * graze scores as a catastrophe.
  */
-const INVULNERABLE_SECONDS = 0.6;
+const INVULNERABLE_SECONDS = 1.1;
 
 /** A body is counted as a graze inside this multiple of the touching distance. */
 const GRAZE_FACTOR = 1.7;
 
 /** Bodies further away than this in z are skipped by the collision test. */
 const COLLISION_Z_WINDOW = 4;
+
+/**
+ * Exponent controlling how strongly obstacles cluster toward the corridor.
+ * 1 is a uniform spread; higher pulls more of them into the middle.
+ */
+const SPREAD_BIAS = 1.25;
+
+/** Map a 0-1 sample to -1..1, weighted toward zero. */
+function biasedSpread(sample: number): number {
+  const t = sample * 2 - 1;
+  return Math.sign(t) * Math.abs(t) ** SPREAD_BIAS;
+}
 
 /** Where a body is recycled once it has passed the camera. */
 const RECYCLE_Z = 14;
@@ -101,8 +113,13 @@ export class FlightRun {
     body.active = true;
     body.z = z;
     body.r = c.radius[0] + this.rng() * (c.radius[1] - c.radius[0]);
-    body.x = (this.rng() - 0.5) * 2 * (c.corridorX + body.r * 0.6);
-    body.y = (this.rng() - 0.5) * 2 * (c.corridorY + body.r * 0.4);
+    // Scatter across the full frame, but bias the distribution toward the
+    // middle. A uniform spread fills the screen at the cost of emptying the
+    // corridor, which makes flying well and flying badly score the same; this
+    // keeps the threat where the player is while still filling the edges.
+    const spread = c.spreadFactor ?? 1;
+    body.x = biasedSpread(this.rng()) * (c.corridorX * spread + body.r * 0.6);
+    body.y = biasedSpread(this.rng()) * (c.corridorY * spread + body.r * 0.4);
     body.spinX = (this.rng() - 0.5) * 1.4;
     body.spinY = (this.rng() - 0.5) * 1.6;
     body.spinZ = (this.rng() - 0.5) * 1.2;
@@ -153,15 +170,19 @@ export class FlightRun {
     // A spring rather than a clamp: drifting out costs performance and pushes
     // back, but never yanks control away from the player.
     let offCorridor = false;
+    this.driftX = 0;
+    this.driftY = 0;
     if (Math.abs(this.shipX) > c.corridorX) {
       offCorridor = true;
+      this.driftX = Math.sign(this.shipX);
       const overshoot = Math.abs(this.shipX) - c.corridorX;
-      this.shipVX -= Math.sign(this.shipX) * overshoot * 9 * dt;
+      this.shipVX -= Math.sign(this.shipX) * overshoot * 16 * dt;
     }
     if (Math.abs(this.shipY) > c.corridorY) {
       offCorridor = true;
+      this.driftY = Math.sign(this.shipY);
       const overshoot = Math.abs(this.shipY) - c.corridorY;
-      this.shipVY -= Math.sign(this.shipY) * overshoot * 9 * dt;
+      this.shipVY -= Math.sign(this.shipY) * overshoot * 16 * dt;
     }
     if (offCorridor) this.stats.offCorridorSeconds += dt;
     this.offCorridor = offCorridor;
@@ -172,7 +193,12 @@ export class FlightRun {
     // Nothing is in the way until the player has the controls. The field is
     // then seeded once, spread across the spawn depth, so the first obstacle
     // arrives a beat after handover rather than all of them at once.
-    if (cinematic) {
+    // Progress through the corridor, used to hold the field back while the
+    // opening cloud deck plays.
+    const progressNow = Math.min(1, this.elapsed / c.durationSeconds);
+    const stillClear = progressNow < (c.clearUntil ?? 0);
+
+    if (cinematic || stillClear) {
       for (const body of this.bodies) body.active = false;
     } else if (!this.fieldSeeded) {
       this.fieldSeeded = true;
@@ -200,6 +226,8 @@ export class FlightRun {
   }
 
   private offCorridor = false;
+  private driftX = 0;
+  private driftY = 0;
   private cinematic = false;
   private liftoff = 0;
   /** True once the corridor has been seeded at the end of the lead-in. */
@@ -268,6 +296,8 @@ export class FlightRun {
       hits: this.stats.hits,
       invulnerable: this.invulnerableFor > 0,
       offCorridor: this.offCorridor,
+      driftX: this.driftX,
+      driftY: this.driftY,
       cinematic: this.cinematic,
       liftoff: this.liftoff,
       finished: this.done,
