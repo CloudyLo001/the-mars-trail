@@ -93,6 +93,12 @@ interface ThreeGameTestHooks {
     /** True during the scripted liftoff, before control hands over. */
     cinematic?: boolean;
     liftoff?: number;
+    /** Launch sequence stage: pad, ignition, boost, staged, flying. */
+    stage?: string;
+    throttle?: number;
+    twr?: number;
+    altitude?: number;
+    health?: number;
   };
   /** Abandon the live sequence. */
   abortFlight(): void;

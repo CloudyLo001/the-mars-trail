@@ -15,6 +15,7 @@ import { createSeededRandom } from '../../utils/random';
 import { scoreFlight } from './scoring';
 import type {
   FlightBody,
+  LaunchStage,
   FlightConfig,
   FlightInput,
   FlightRunResult,
@@ -52,6 +53,20 @@ function biasedSpread(sample: number): number {
   return Math.sign(t) * Math.abs(t) ** SPREAD_BIAS;
 }
 
+/** Dry mass, and the mass the boosters add while they are still attached. */
+const CORE_MASS = 1;
+const BOOSTER_MASS = 1.4;
+
+/** Thrust in the same arbitrary units as mass. */
+const CORE_THRUST = 1.9;
+const BOOSTER_THRUST = 2.7;
+
+/** How long the boosters burn at full throttle, in seconds. */
+const BOOSTER_BURN_SECONDS = 11;
+
+/** Hull damage per impact. Roughly six hits ends an ascent. */
+const IMPACT_DAMAGE = 17;
+
 /** Where a body is recycled once it has passed the camera. */
 const RECYCLE_Z = 14;
 
@@ -85,6 +100,9 @@ export class FlightRun {
     readonly config: FlightConfig,
     seed: number,
   ) {
+    // The ascent begins held on the pad awaiting ignition; every other
+    // sequence is already under way.
+    if (config.id === 'launch') this.stage = 'pad';
     this.rng = createSeededRandom(seed);
     this.currentSpeed = config.speed;
 
@@ -105,6 +123,54 @@ export class FlightRun {
       // Stagger the initial field across the whole spawn depth so the corridor
       // is already populated on the first frame rather than filling in.
       this.respawn(body, -this.rng() * config.spawnDepth);
+    }
+  }
+
+  /**
+   * One step of the launch sequence.
+   *
+   * Thrust-to-weight is the whole mechanic: below 1.0 the clamps hold and
+   * nothing happens, so the player has to throttle up before anything moves.
+   * Staging sheds the booster mass, which makes the vehicle leap.
+   */
+  private stepLaunch(dt: number, input: FlightInput): void {
+    if (this.stage === 'pad') {
+      if (input.ignitePressed) this.stage = 'ignition';
+      return;
+    }
+
+    // Throttle is held, not toggled, so leaving the pad is an act.
+    const command = input.throttleDown ? -0.55 : input.throttleUp ? 1 : this.stage === 'ignition' ? 0 : 0.2;
+    this.throttle = Math.max(0, Math.min(1, this.throttle + command * dt * 0.75));
+
+    const hasBoosters = this.stage === 'ignition' || this.stage === 'boost';
+    const mass = CORE_MASS + (hasBoosters ? BOOSTER_MASS * this.boosterFuel : 0);
+    const thrust = this.throttle * (CORE_THRUST + (hasBoosters ? BOOSTER_THRUST : 0));
+    this.twr = thrust / mass;
+
+    if (hasBoosters && this.stage !== 'ignition') {
+      this.boosterFuel = Math.max(0, this.boosterFuel - (this.throttle * dt) / BOOSTER_BURN_SECONDS);
+    }
+
+    if (this.stage === 'ignition') {
+      // The clamps hold until the stack can actually lift itself.
+      if (this.twr > 1) this.stage = 'boost';
+      return;
+    }
+
+    if (this.stage === 'boost') {
+      this.altitude += Math.max(0, this.twr - 1) * dt * 240;
+      // Staging is the player's call, but a burnt-out booster is dead weight.
+      if (input.stagePressed && this.altitude > 120) {
+        this.stage = 'staged';
+        this.boosterFuel = 0;
+      }
+      return;
+    }
+
+    if (this.stage === 'staged') {
+      this.altitude += Math.max(0, this.twr - 1) * dt * 240;
+      if (this.altitude > 900) this.stage = 'flying';
     }
   }
 
@@ -134,32 +200,44 @@ export class FlightRun {
     const c = this.config;
     this.elapsed += dt;
 
-    // --- scripted liftoff -------------------------------------------------
-    // During the lead-in the player has no control and nothing is in the way:
-    // the vehicle simply climbs off the pad. Input is discarded rather than
-    // merely ignored downstream, so a player mashing keys through the cutscene
-    // cannot bank the ship before they are meant to have it.
-    const leadIn = c.leadInSeconds ?? 0;
-    const cinematic = this.elapsed < leadIn;
+    // --- launch sequence --------------------------------------------------
+    // Only the ascent runs this. Everything else is already flying.
+    if (this.stage !== 'flying') {
+      this.stepLaunch(dt, input);
+    }
+    const cinematic = this.stage === 'pad' || this.stage === 'ignition';
     this.cinematic = cinematic;
-    this.liftoff = leadIn > 0 ? Math.min(1, this.elapsed / leadIn) : 1;
+    this.liftoff = this.stage === 'pad' ? 0 : this.stage === 'ignition' ? this.throttle : 1;
 
     if (cinematic) {
-      input = { x: 0, y: 0, boost: false, brake: false };
+      // No lateral control until the vehicle is off the pad.
+      input = { ...input, x: 0, y: 0 };
     }
 
     // --- speed -----------------------------------------------------------
     // Thrust builds from rest over the lead-in rather than starting at cruise.
     const cruise = c.speed + (input.boost ? c.boostSpeed : 0) - (input.brake ? c.speed * 0.3 : 0);
-    const target = cinematic ? cruise * (0.12 + 0.88 * this.liftoff * this.liftoff) : cruise;
+    const target =
+      this.stage === 'pad'
+        ? 0
+        : this.stage === 'ignition'
+          ? cruise * 0.1
+          : this.stage === 'boost'
+            ? cruise * (0.35 + 0.65 * this.throttle)
+            : cruise;
     this.currentSpeed += (target - this.currentSpeed) * (1 - Math.exp(-3 * dt));
     this.distance += this.currentSpeed * dt;
 
     // --- steering --------------------------------------------------------
     // Acceleration toward the input with drag, so the ship carries momentum
     // rather than snapping. Drag is exponential so it is frame-rate stable.
-    this.shipVX += input.x * c.agility * dt;
-    this.shipVY += input.y * c.agility * dt;
+    // Gimballed engines: you can only steer as hard as you are thrusting.
+    const authority =
+      this.stage === 'boost' || this.stage === 'staged'
+        ? c.agility * (0.35 + 0.65 * this.throttle)
+        : c.agility;
+    this.shipVX += input.x * authority * dt;
+    this.shipVY += input.y * authority * dt;
     const drag = Math.exp(-4.5 * dt);
     this.shipVX *= drag;
     this.shipVY *= drag;
@@ -196,7 +274,8 @@ export class FlightRun {
     // Progress through the corridor, used to hold the field back while the
     // opening cloud deck plays.
     const progressNow = Math.min(1, this.elapsed / c.durationSeconds);
-    const stillClear = progressNow < (c.clearUntil ?? 0);
+    const stillClear =
+      progressNow < (c.clearUntil ?? 0) || (this.stage !== 'flying' && this.stage !== 'staged');
 
     if (cinematic || stillClear) {
       for (const body of this.bodies) body.active = false;
@@ -226,10 +305,20 @@ export class FlightRun {
   }
 
   private offCorridor = false;
+  // --- launch sequence -----------------------------------------------------
+  // Mirrors the reference rocket sim: ignition, a throttle you hold, gimbal
+  // authority proportional to thrust, and a staging event that sheds mass.
+  private stage: LaunchStage = 'flying';
+  private throttle = 0;
+  private altitude = 0;
+  /** Propellant fraction remaining in the boosters. */
+  private boosterFuel = 1;
+  private health = 100;
   private driftX = 0;
   private driftY = 0;
   private cinematic = false;
   private liftoff = 0;
+  private twr = 0;
   /** True once the corridor has been seeded at the end of the lead-in. */
   private fieldSeeded = false;
 
@@ -248,6 +337,20 @@ export class FlightRun {
       if (this.invulnerableFor > 0) return;
       this.invulnerableFor = INVULNERABLE_SECONDS;
       this.stats.hits += 1;
+      // Hull health is the player-facing version of hit severity: the same
+      // event, expressed as a bar they can watch rather than a number they
+      // have to infer.
+      this.health = Math.max(0, this.health - IMPACT_DAMAGE);
+      // Only the ascent ends on a destroyed hull, because only the ascent is
+      // retryable at no cost. In a hazard corridor a wrecked hull is already
+      // punished through performance, and cutting the run short there would
+      // mean a bad flight scored better than a terrible one.
+      if (this.health <= 0 && this.config.id === 'launch') {
+        this.done = true;
+        this.stats.completed = false;
+        this.stats.seconds = this.elapsed;
+        this.stats.destroyed = true;
+      }
       // Severity scales with how fast and how big — clipping a boulder at boost
       // should cost more than brushing a bolt while braking.
       this.stats.hitSeverity += (this.currentSpeed / this.config.speed) * body.r * 2.2;
@@ -300,6 +403,11 @@ export class FlightRun {
       driftY: this.driftY,
       cinematic: this.cinematic,
       liftoff: this.liftoff,
+      stage: this.stage,
+      throttle: this.throttle,
+      twr: this.twr,
+      altitude: this.altitude,
+      health: this.health,
       finished: this.done,
     };
   }

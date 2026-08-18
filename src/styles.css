@@ -1044,13 +1044,36 @@ button:disabled {
 
 /* ------------------------------------------------------------------- Log */
 
+.log-card {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 60px);
+}
+
 .log-list {
-  max-height: 46vh;
+  /* min-height:0 is what actually lets a flex child scroll rather than
+     stretching its parent and pushing the close button off screen. */
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
   display: grid;
   gap: 4px;
   margin-bottom: 14px;
-  padding-right: 6px;
+  padding-right: 8px;
+  align-content: start;
+}
+
+.log-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.log-list::-webkit-scrollbar-thumb {
+  background: rgba(74, 226, 74, 0.32);
+}
+
+.log-card .card-choices {
+  flex: 0 0 auto;
+  margin-top: auto;
 }
 
 .log-entry {
@@ -1182,6 +1205,75 @@ button:disabled {
   color: var(--red);
 }
 
+/* --------------------------------------------------- Crossing progress */
+
+.mars-progress {
+  position: absolute;
+  top: 68px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+  pointer-events: none;
+}
+
+.mars-track {
+  position: relative;
+  width: 180px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--panel-edge);
+}
+
+.mars-fill {
+  height: 100%;
+  width: 0;
+  background: var(--green);
+  transition: width 0.4s ease-out;
+}
+
+.mars-marker {
+  position: absolute;
+  top: -3px;
+  left: 0;
+  width: 2px;
+  height: 10px;
+  background: var(--amber);
+  transition: left 0.4s ease-out;
+}
+
+.mars-value {
+  color: var(--green);
+  min-width: 32px;
+  text-align: right;
+}
+
+/* ------------------------------------------------------- Crew stat legend */
+
+.crew-legend {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+}
+
+.crew-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.crew-legend i {
+  width: 8px;
+  height: 3px;
+  display: inline-block;
+}
+
 /* ------------------------------------------------------------- Flight HUD */
 
 .flight-hud {
@@ -1223,6 +1315,45 @@ button:disabled {
   width: 0;
   background: var(--green);
   box-shadow: 0 0 8px rgba(74, 226, 74, 0.7);
+}
+
+.flight-health {
+  justify-self: center;
+  align-self: start;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--text-dim);
+}
+
+.flight-health-track {
+  width: min(300px, 40vw);
+  height: 6px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid var(--panel-edge);
+}
+
+.flight-health-fill {
+  height: 100%;
+  width: 100%;
+  background: var(--green);
+  transition: width 0.25s ease-out, background 0.25s ease-out;
+}
+
+.flight-prompt {
+  align-self: center;
+  justify-self: center;
+  color: var(--amber);
+  font-size: 17px;
+  letter-spacing: 0.16em;
+  text-shadow: 0 0 12px rgba(255, 182, 39, 0.4);
+}
+
+.flight-prompt[hidden] {
+  display: none;
 }
 
 .flight-warning {

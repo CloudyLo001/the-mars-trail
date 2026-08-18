@@ -15,6 +15,9 @@ export class FlightHud {
   private readonly warning = this.element('#flight-warning');
   private readonly speed = this.element('#flight-speed');
   private readonly hits = this.element('#flight-hits');
+  private readonly health = this.element('#flight-health');
+  private readonly prompt = this.element('#flight-prompt');
+  private readonly hint = this.element('#flight-hint');
 
   private lastHits = -1;
 
@@ -40,6 +43,28 @@ export class FlightHud {
 
     // With the camera on the nose there is no horizon to judge the lane
     // against, so the warning has to say which way back.
+    // Hull health, as a bar rather than a number to infer from impacts.
+    this.health.style.width = `${Math.max(0, view.health)}%`;
+    this.health.style.background =
+      view.health <= 30 ? 'var(--red)' : view.health <= 60 ? 'var(--amber)' : 'var(--green)';
+
+    // The launch is a sequence, so it tells you what it wants next.
+    const prompts: Record<string, string> = {
+      pad: 'PRESS SPACE TO IGNITE',
+      ignition: 'HOLD W — THROTTLE UP',
+      boost: view.altitude > 120 ? 'PRESS Z — STAGE' : 'HOLD W',
+      staged: '',
+      flying: '',
+    };
+    const prompt = prompts[view.stage] ?? '';
+    this.prompt.hidden = prompt === '';
+    if (prompt) this.prompt.textContent = prompt;
+
+    this.hint.textContent =
+      view.stage === 'flying' || view.stage === 'staged'
+        ? 'WASD or mouse · Esc abort'
+        : 'W throttle · A/D gimbal · Z stage · Esc abort';
+
     this.warning.hidden = !view.offCorridor;
     if (view.offCorridor) {
       const arrows: string[] = [];

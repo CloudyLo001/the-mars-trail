@@ -360,16 +360,24 @@ export class Game {
    */
   private startLaunch(): void {
     this.beginFlight('launch', (result) => {
-      // The ascent cannot fail. It is the first thing a new run touches, it is
-      // the tutorial for the controls, and being bounced back to the pad after
-      // ten minutes of outfitting is the most discouraging thing this game
-      // could do. Performance only decides the flavour of the arrival.
+      // A destroyed hull is the one way the ascent ends badly, and it resets
+      // to the pad immediately at no cost — nothing is spent and no day
+      // passes, so a retry costs only the attempt.
+      if (result.destroyed) {
+        this.showOutcome(
+          'VEHICLE LOST',
+          'The hull came apart. A new stack is on the pad. Go again.',
+          true,
+          () => this.startLaunch(),
+        );
+        return;
+      }
       const clean = result.performance > 0.7;
       this.showOutcome(
         'ORBIT ACHIEVED',
         clean
-          ? 'A clean ascent. The tower falls away, the sky goes black, and Mars is two hundred and twenty-five million kilometres ahead.'
-          : 'Rough, and the hull has the scars to prove it — but you are up. The sky goes black and the real crossing begins.',
+          ? 'Clean ascent. Mars is 225 million km ahead.'
+          : 'Rough, but you are up. The crossing begins.',
         false,
       );
     });
@@ -422,10 +430,19 @@ export class Game {
     this.hud.setVisible(false);
     this.flightHud.setTitle(config.title);
     this.flightHud.setVisible(true);
-    this.audio.play('hazard');
+
+    if (sequence === 'launch') {
+      // The ascent is the one moment the game is loud. The drive ambience is
+      // silenced under it so the two engine beds do not fight.
+      this.audio.setBurnIntensity(0);
+      this.audio.startLaunchRoar();
+    } else {
+      this.audio.play('hazard');
+    }
   }
 
   private endFlight(result: FlightRunResult, onComplete: (r: FlightRunResult) => void): void {
+    this.audio.stopLaunchRoar();
     this.input.detach();
     this.flightHud.setVisible(false);
 
@@ -653,6 +670,7 @@ export class Game {
       daysToNext: this.sim.daysToNext(),
       nextName: waypoint?.name ?? this.sim.leg().to,
       kmToNext: this.sim.kmToNext(),
+      crossing: this.sim.crossingProgress(),
     });
   }
 
@@ -673,7 +691,17 @@ export class Game {
 
     if (this.flight) {
       this.flight.update(delta, elapsed);
-      if (this.flight) this.flightHud.update(this.flight.view);
+      if (this.flight) {
+        const view = this.flight.view;
+        this.flightHud.update(view);
+        if (this.flight.sequence === 'launch') {
+          // Throttle climbs off the pad, and the roar thins as the atmosphere
+          // does — by the top of the climb there is almost no air to carry it.
+          const throttle = view.cinematic ? 0.25 + view.liftoff * 0.75 : 1;
+          const airDensity = Math.max(0, 1 - view.progress * 1.9);
+          this.audio.setLaunchIntensity(throttle, airDensity);
+        }
+      }
       this.publishDiagnostics();
       return;
     }
@@ -790,6 +818,11 @@ export class Game {
           shipY: view.shipY,
           cinematic: view.cinematic,
           liftoff: view.liftoff,
+          stage: view.stage,
+          throttle: view.throttle,
+          twr: view.twr,
+          altitude: view.altitude,
+          health: view.health,
         };
       },
       abortFlight: () => {

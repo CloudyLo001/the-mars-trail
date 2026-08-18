@@ -10,6 +10,12 @@
 export type FlightSequenceId = 'launch' | 'kessler' | 'asteroid-fringe' | 'mars-descent';
 
 /** Normalised player intent for a single step. */
+/**
+ * Where the launch has got to. Only the ascent uses these; every other
+ * sequence starts already flying.
+ */
+export type LaunchStage = 'pad' | 'ignition' | 'boost' | 'staged' | 'flying';
+
 export interface FlightInput {
   /** Lateral steering, -1 (left) to 1 (right). */
   x: number;
@@ -17,6 +23,10 @@ export interface FlightInput {
   y: number;
   boost: boolean;
   brake: boolean;
+  throttleUp?: boolean;
+  throttleDown?: boolean;
+  ignitePressed?: boolean;
+  stagePressed?: boolean;
 }
 
 export const NEUTRAL_INPUT: FlightInput = { x: 0, y: 0, boost: false, brake: false };
@@ -109,12 +119,24 @@ export interface FlightRunView {
   driftY: number;
   /** True during the scripted opening, before control hands over. */
   cinematic: boolean;
+  /** Launch sequence state. 'flying' for every non-launch sequence. */
+  stage: LaunchStage;
+  /** 0-1 commanded engine throttle. */
+  throttle: number;
+  /** Thrust-to-weight. Below 1 the vehicle stays on the pad. */
+  twr: number;
+  /** Metres climbed during the boost phase. */
+  altitude: number;
+  /** 0-100 hull health. Reaching zero ends the ascent. */
+  health: number;
   /** 0-1 through the scripted opening. 1 once the player has control. */
   liftoff: number;
   finished: boolean;
 }
 
 export interface FlightStats {
+  /** True when the hull was destroyed outright, as opposed to abandoned. */
+  destroyed?: boolean;
   hits: number;
   hitSeverity: number;
   /** Near-misses. Rewards flying tight rather than hugging the corridor edge. */
@@ -125,6 +147,8 @@ export interface FlightStats {
 }
 
 export interface FlightRunResult {
+  /** True when the hull was destroyed. The ascent uses this to send you back. */
+  destroyed: boolean;
   sequence: FlightSequenceId;
   completed: boolean;
   /**

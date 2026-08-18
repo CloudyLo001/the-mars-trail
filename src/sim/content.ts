@@ -20,7 +20,7 @@ export const PROFESSIONS: Profession[] = [
     name: 'Corporate Financier',
     startingCredits: 1100,
     scoreMultiplier: 1,
-    blurb: 'Consortium money and a clean berth. The easiest crossing.',
+    blurb: 'Rich start, easiest crossing.',
     perk: 'Station markups are 15% lower.',
   },
   {
@@ -28,7 +28,7 @@ export const PROFESSIONS: Profession[] = [
     name: "Ship's Engineer",
     startingCredits: 800,
     scoreMultiplier: 2,
-    blurb: 'You know the drive better than the yard techs do.',
+    blurb: 'You know the drive better than the yard does.',
     perk: 'Repairs cost half the spares and drive cores wear 20% slower.',
   },
   {
@@ -36,7 +36,7 @@ export const PROFESSIONS: Profession[] = [
     name: 'Terraform Homesteader',
     startingCredits: 400,
     scoreMultiplier: 3,
-    blurb: 'Everything you own is seed stock and stubbornness.',
+    blurb: 'Seed stock and stubbornness.',
     perk: 'Hydroponics yields rations passively; harvests return 30% more.',
   },
 ];
@@ -51,7 +51,7 @@ export const STORE_ITEMS: StoreItem[] = [
     basePrice: 120,
     step: 1,
     description:
-      'Fusion-pulse cores. Two will move the ship; they wear, overheat, and fail. Most captains leave with four to six.',
+      'Two will move the ship. Four to six will get it to Mars.',
   },
   {
     id: 'rationsKg',
@@ -60,7 +60,7 @@ export const STORE_ITEMS: StoreItem[] = [
     basePrice: 0.3,
     step: 100,
     description:
-      'Pressed protein and freeze-dried stock. A crew of five on filling rations eats roughly 10 kg a day.',
+      'Five crew on filling rations eat about 10 kg a day.',
   },
   {
     id: 'waterL',
@@ -68,7 +68,7 @@ export const STORE_ITEMS: StoreItem[] = [
     unit: 'L',
     basePrice: 0.1,
     step: 100,
-    description: 'Reclaim recovers most of it, but never all of it. Ice harvesting tops it back up.',
+    description: 'Reclaim recovers most, never all.',
   },
   {
     id: 'radSuits',
@@ -77,7 +77,7 @@ export const STORE_ITEMS: StoreItem[] = [
     basePrice: 12,
     step: 1,
     description:
-      'Layered shielding for flare events and EVA work. Without one per crew member, a solar storm is brutal.',
+      'One per crew, or a solar storm is brutal.',
   },
   {
     id: 'propellantCells',
@@ -85,7 +85,7 @@ export const STORE_ITEMS: StoreItem[] = [
     unit: 'cell',
     basePrice: 8,
     step: 20,
-    description: 'Spent on course corrections, hazard burns, and every harvest EVA.',
+    description: 'Course corrections, hazard burns, EVAs.',
   },
   {
     id: 'coolantPumps',
@@ -93,7 +93,7 @@ export const STORE_ITEMS: StoreItem[] = [
     unit: 'pump',
     basePrice: 15,
     step: 1,
-    description: 'A seized pump cooks a drive core. Carry spares.',
+    description: 'A seized pump cooks a core.',
   },
   {
     id: 'heatShield',
@@ -101,7 +101,7 @@ export const STORE_ITEMS: StoreItem[] = [
     unit: 'set',
     basePrice: 25,
     step: 1,
-    description: 'You will need these intact at Mars. Aerobraking without them is not survivable.',
+    description: 'You cannot land without one.',
   },
   {
     id: 'commsArray',
@@ -109,7 +109,7 @@ export const STORE_ITEMS: StoreItem[] = [
     unit: 'array',
     basePrice: 20,
     step: 1,
-    description: 'Lose comms and you lose navigation updates, station trade, and crew morale.',
+    description: 'Lose it and you lose navigation and morale.',
   },
   {
     id: 'hullPlates',
@@ -117,7 +117,7 @@ export const STORE_ITEMS: StoreItem[] = [
     unit: 'plate',
     basePrice: 18,
     step: 1,
-    description: 'Patch material for micrometeoroid punctures and debris strikes.',
+    description: 'Patches punctures and debris strikes.',
   },
 ];
 
@@ -204,7 +204,7 @@ export const LEGS: Leg[] = [
         name: 'Standard Ascent Corridor',
         distanceMultiplier: 1,
         severityMultiplier: 1,
-        description: 'The mapped lane. Traffic control, a transfer ring, and a known debris census.',
+        description: 'Mapped and monitored. A transfer ring on the way.',
         hasStation: true,
       },
       {
@@ -212,7 +212,7 @@ export const LEGS: Leg[] = [
         name: 'Polar Sling',
         distanceMultiplier: 0.82,
         severityMultiplier: 1.45,
-        description: 'Steeper, faster, and straight through the uncatalogued junk above the poles.',
+        description: 'Shorter, and straight through uncatalogued junk.',
         hasStation: false,
       },
     ],
@@ -224,7 +224,7 @@ export const LEGS: Leg[] = [
         kmFromLegStart: 62_000,
         severity: 0,
         description:
-          'A working ring of tugs, fuel bladders, and short-tempered dockmasters. Last cheap supplies you will see.',
+          'Last cheap supplies you will see.',
         routeId: 'standard-ascent',
       },
       {
@@ -234,7 +234,7 @@ export const LEGS: Leg[] = [
         kmFromLegStart: 178_000,
         severity: 0.38,
         description:
-          'Trapped particle belts. Every hour inside them is dose your crew never gives back.',
+          'Trapped particle belts. Every hour here is dose.',
       },
       {
         id: 'lunar-gateway',
@@ -243,7 +243,7 @@ export const LEGS: Leg[] = [
         kmFromLegStart: 384_000,
         severity: 0,
         description:
-          'The last true port. Drive cores, spares, and the final chance to turn back without shame.',
+          'The last true port. Cores, spares, one last chance to turn back.',
       },
     ],
   },
@@ -262,7 +262,7 @@ export const LEGS: Leg[] = [
         distanceMultiplier: 1.22,
         severityMultiplier: 0.6,
         description:
-          'Swept and monitored. Longer, and the corridor toll is not cheap, but the sky is empty.',
+          'Longer, but the sky is empty. Has a station.',
         hasStation: true,
       },
       {
@@ -283,7 +283,7 @@ export const LEGS: Leg[] = [
         kmFromLegStart: 340_000,
         severity: 0.55,
         description:
-          'A cascade that started in 2043 and never stopped. Ten thousand tracked objects and no map of the rest.',
+          'Ten thousand tracked objects, and no map of the rest.',
       },
       {
         id: 'graveyard-drift',
@@ -292,7 +292,7 @@ export const LEGS: Leg[] = [
         kmFromLegStart: 690_000,
         severity: 0.3,
         description:
-          'Tumbling hulks with tanks that were never drained. Cut them open and you eat for a month.',
+          'Tanks that were never drained. Cut them open and you eat.',
         routeId: 'the-graveyard',
       },
       {
@@ -302,7 +302,7 @@ export const LEGS: Leg[] = [
         kmFromLegStart: 1_120_000,
         severity: 0,
         description:
-          'A cramped balance point between two gravities. Everything is expensive and nothing is fresh.',
+          'Expensive, and nothing is fresh.',
       },
     ],
   },
@@ -342,7 +342,7 @@ export const LEGS: Leg[] = [
         kmFromLegStart: 24_000_000,
         severity: 0.62,
         description:
-          'An active region has rotated to face the trajectory. There is no shelter out here but shielding and luck.',
+          'No shelter out here but shielding and luck.',
       },
       {
         id: 'ice-field',
@@ -351,7 +351,7 @@ export const LEGS: Leg[] = [
         kmFromLegStart: 51_000_000,
         severity: 0.2,
         description:
-          'Dirty ice from an old cometary tail, drifting in slow formation. Water, if someone will go out and take it.',
+          'Water, if someone goes out and takes it.',
       },
       {
         id: 'cosmic-deep',
@@ -360,7 +360,7 @@ export const LEGS: Leg[] = [
         kmFromLegStart: 72_000_000,
         severity: 0.45,
         description:
-          'No landmarks. No transmissions under forty minutes old. This is where crews come apart.',
+          'No landmarks. This is where crews come apart.',
       },
       {
         id: 'asteroid-fringe',
@@ -368,7 +368,7 @@ export const LEGS: Leg[] = [
         kind: 'landmark',
         kmFromLegStart: 90_000_000,
         severity: 0,
-        description: 'The first rocks. After eleven weeks of nothing, even a rock is company.',
+        description: 'After eleven weeks of nothing, even a rock is company.',
       },
     ],
   },
@@ -406,7 +406,7 @@ export const LEGS: Leg[] = [
         kind: 'hazard',
         kmFromLegStart: 28_000_000,
         severity: 0.58,
-        description: 'A loose family of collision debris, none of it charted, all of it moving.',
+        description: 'Uncharted collision debris, all of it moving.',
       },
       {
         id: 'ceres-depot',
@@ -415,7 +415,7 @@ export const LEGS: Leg[] = [
         kmFromLegStart: 55_000_000,
         severity: 0,
         description:
-          'Hollowed regolith, forty permanent residents, and the only fresh vegetables between here and Mars.',
+          'The only fresh vegetables between here and Mars.',
         routeId: 'ceres-lane',
       },
       {
@@ -425,7 +425,7 @@ export const LEGS: Leg[] = [
         kmFromLegStart: 78_000_000,
         severity: 0.5,
         description:
-          'Grains of iron at nineteen kilometres a second. You will not see the one that matters.',
+          'You will not see the one that matters.',
       },
     ],
   },
@@ -465,7 +465,7 @@ export const LEGS: Leg[] = [
         kmFromLegStart: 18_000_000,
         severity: 0,
         description:
-          'Bolted to a captured asteroid, half-buried in dust. The colony reads your manifest before you dock.',
+          'The colony reads your manifest before you dock.',
         routeId: 'phobos-brake',
       },
       {
@@ -475,7 +475,7 @@ export const LEGS: Leg[] = [
         kmFromLegStart: 34_000_000,
         severity: 0.6,
         description:
-          'One burn, one window. Too shallow and you sail past Mars into a very long silence.',
+          'One burn, one window. Miss it and you sail past.',
       },
       {
         id: 'ares-descent',
@@ -484,7 +484,7 @@ export const LEGS: Leg[] = [
         kmFromLegStart: 45_000_000,
         severity: 0.62,
         description:
-          'Aerobrake, then powered descent through a dust season nobody warned you about. Then ground.',
+          'Aerobrake, then powered descent. Then ground.',
       },
     ],
   },

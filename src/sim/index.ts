@@ -6,7 +6,7 @@
  * browser-free so the whole model can be exercised in a plain Node test.
  */
 
-import { LEGS, STORE_ITEMS, activeWaypoints, professionById } from './content';
+import { LEGS, STORE_ITEMS, TOTAL_MISSION_KM, activeWaypoints, professionById } from './content';
 import { resolveEventChoice, rollEvent } from './events';
 import { resolveHazard, hazardOptions, type HazardOptionId, type HazardResolution } from './hazards';
 import { scoreRun, type ScoreReport } from './score';
@@ -50,6 +50,7 @@ export * from './types';
 export { FLYABLE_WAYPOINTS, flightSequenceFor } from './content';
 export {
   LEGS,
+  TOTAL_MISSION_KM,
   PROFESSIONS,
   STORE_ITEMS,
   ILLNESS_LABELS,
@@ -131,6 +132,11 @@ export class MarsTrailSim {
     const rate = kmPerDay(this.state);
     if (rate <= 0) return Infinity;
     return Math.max(1, Math.ceil(this.kmToNext() / rate));
+  }
+
+  /** 0-1 of the whole Earth-to-Mars crossing covered so far. */
+  crossingProgress(): number {
+    return Math.max(0, Math.min(1, this.state.kmTotal / TOTAL_MISSION_KM));
   }
 
   legRemaining(): number {

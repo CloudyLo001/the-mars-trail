@@ -92,6 +92,12 @@ run.
 
 Steer with **WASD or the mouse**, **Shift** to boost, **Escape** to abandon.
 
+The ascent is the one moment the game is loud. An ignition crack fires as the clamps release and
+a looping engine roar runs under the whole climb, its level tracking engine throttle and thinning
+with the atmosphere — by the top of the climb there is almost no air left to carry it. The drive
+ambience that plays for the rest of the crossing is silenced underneath it so the two engine beds
+do not fight.
+
 The sky is drawn as **flat opaque bands** rather than a gradient, stepping through solid colours
 as altitude builds, so the climb reads as passing through distinct layers of atmosphere. The pad,
 gantry, tank farm, blast berm, and the mesa ridge on the horizon all drop away beneath you.

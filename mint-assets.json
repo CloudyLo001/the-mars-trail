@@ -432,6 +432,84 @@
         }
       }
     },
+    "audio-launch-ignition": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "audio",
+        "assetId": "xd73c94xj6n2b6je791x9r5jjn8cp2v3"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "audio_file": {
+          "artifactId": "audio_file",
+          "role": "audio",
+          "format": "mp3",
+          "contentType": "audio/mpeg",
+          "filename": "Launch-Ignition-a76420.mp3",
+          "localPath": "public/assets/mint/audio-launch-ignition/audio_file.mp3",
+          "loaderHint": "audio",
+          "byteSize": 112893,
+          "durationSeconds": 7
+        }
+      }
+    },
+    "audio-launch-roar": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "audio",
+        "assetId": "xd760ezpj49aa6p9a6mc28t3ns8cqqpm"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "audio_file": {
+          "artifactId": "audio_file",
+          "role": "audio",
+          "format": "mp3",
+          "contentType": "audio/mpeg",
+          "filename": "Launch-Engine-Roar-a9fbdd.mp3",
+          "localPath": "public/assets/mint/audio-launch-roar/audio_file.mp3",
+          "loaderHint": "audio",
+          "byteSize": 321036,
+          "durationSeconds": 20
+        }
+      }
+    },
     "crew-portrait-1": {
       "source": {
         "manifestVersion": 1,
@@ -990,7 +1068,7 @@
         "manifestVersion": 1,
         "kind": "asset",
         "assetType": "model",
-        "assetId": "ks744yra0bt53686x8f4j7ctzx8cqews"
+        "assetId": "ks7a3748mwvdm2g0yfcjycm9358cpq18"
       },
       "transform": {
         "position": [
@@ -1016,10 +1094,10 @@
           "role": "canonical_model",
           "format": "glb",
           "contentType": "model/gltf-binary",
-          "filename": "desert-launch-pad-zx8cqews-original.glb",
+          "filename": "coastal-launch-pad-358cpq18-original.glb",
           "localPath": "public/assets/mint/desert-01/original_glb.glb",
           "loaderHint": "gltf",
-          "byteSize": 676892,
+          "byteSize": 550644,
           "extensionsUsed": [],
           "extensionsRequired": [],
           "usesDraco": false,
@@ -1035,10 +1113,10 @@
           "role": "preview_image",
           "format": "webp",
           "contentType": "image/webp",
-          "filename": "desert-launch-pad-zx8cqews-preview.webp",
+          "filename": "coastal-launch-pad-358cpq18-preview.webp",
           "localPath": "public/assets/mint/desert-01/preview_image.webp",
           "loaderHint": "image",
-          "byteSize": 52592
+          "byteSize": 42252
         }
       },
       "thumbnailUrl": "public/assets/mint/desert-01/preview_image.webp"
@@ -1048,7 +1126,7 @@
         "manifestVersion": 1,
         "kind": "asset",
         "assetType": "model",
-        "assetId": "ks77yvz7kgw4zp5jkgjzx4ez0h8cqf4z"
+        "assetId": "ks759bp2sjd8b34q0z2mmzeezd8cpde6"
       },
       "transform": {
         "position": [
@@ -1074,10 +1152,10 @@
           "role": "canonical_model",
           "format": "glb",
           "contentType": "model/gltf-binary",
-          "filename": "service-gantry-tower-0h8cqf4z-original.glb",
+          "filename": "service-tower-zd8cpde6-original.glb",
           "localPath": "public/assets/mint/desert-02/original_glb.glb",
           "loaderHint": "gltf",
-          "byteSize": 1107584,
+          "byteSize": 1273360,
           "extensionsUsed": [],
           "extensionsRequired": [],
           "usesDraco": false,
@@ -1093,10 +1171,10 @@
           "role": "preview_image",
           "format": "webp",
           "contentType": "image/webp",
-          "filename": "service-gantry-tower-0h8cqf4z-preview.webp",
+          "filename": "service-tower-zd8cpde6-preview.webp",
           "localPath": "public/assets/mint/desert-02/preview_image.webp",
           "loaderHint": "image",
-          "byteSize": 103568
+          "byteSize": 98622
         }
       },
       "thumbnailUrl": "public/assets/mint/desert-02/preview_image.webp"
@@ -1106,7 +1184,7 @@
         "manifestVersion": 1,
         "kind": "asset",
         "assetType": "model",
-        "assetId": "ks7cnz99y3y80bs0tpqp3r4tw98cqwr1"
+        "assetId": "ks709d0gxpg2g51a3tqkq25qbs8cpswx"
       },
       "transform": {
         "position": [
@@ -1132,10 +1210,10 @@
           "role": "canonical_model",
           "format": "glb",
           "contentType": "model/gltf-binary",
-          "filename": "desert-ground-tile-w98cqwr1-original.glb",
+          "filename": "coastal-scrub-ground-bs8cpswx-original.glb",
           "localPath": "public/assets/mint/desert-03/original_glb.glb",
           "loaderHint": "gltf",
-          "byteSize": 817576,
+          "byteSize": 734416,
           "extensionsUsed": [],
           "extensionsRequired": [],
           "usesDraco": false,
@@ -1151,10 +1229,10 @@
           "role": "preview_image",
           "format": "webp",
           "contentType": "image/webp",
-          "filename": "desert-ground-tile-w98cqwr1-preview.webp",
+          "filename": "coastal-scrub-ground-bs8cpswx-preview.webp",
           "localPath": "public/assets/mint/desert-03/preview_image.webp",
           "loaderHint": "image",
-          "byteSize": 56912
+          "byteSize": 45396
         }
       },
       "thumbnailUrl": "public/assets/mint/desert-03/preview_image.webp"
@@ -1164,7 +1242,7 @@
         "manifestVersion": 1,
         "kind": "asset",
         "assetType": "model",
-        "assetId": "ks7b1ft4n41nhtmv1agnb0q9758cqst4"
+        "assetId": "ks7btp0bbm6wx0rdh97amj7aen8cp676"
       },
       "transform": {
         "position": [
@@ -1190,10 +1268,10 @@
           "role": "canonical_model",
           "format": "glb",
           "contentType": "model/gltf-binary",
-          "filename": "desert-mesa-ridge-758cqst4-original.glb",
+          "filename": "wooded-hill-ridge-en8cp676-original.glb",
           "localPath": "public/assets/mint/desert-04/original_glb.glb",
           "loaderHint": "gltf",
-          "byteSize": 890636,
+          "byteSize": 593292,
           "extensionsUsed": [],
           "extensionsRequired": [],
           "usesDraco": false,
@@ -1209,10 +1287,10 @@
           "role": "preview_image",
           "format": "webp",
           "contentType": "image/webp",
-          "filename": "desert-mesa-ridge-758cqst4-preview.webp",
+          "filename": "wooded-hill-ridge-en8cp676-preview.webp",
           "localPath": "public/assets/mint/desert-04/preview_image.webp",
           "loaderHint": "image",
-          "byteSize": 37662
+          "byteSize": 27098
         }
       },
       "thumbnailUrl": "public/assets/mint/desert-04/preview_image.webp"
@@ -1222,7 +1300,7 @@
         "manifestVersion": 1,
         "kind": "asset",
         "assetType": "model",
-        "assetId": "ks7f16x0pcxfvgghdeshsff1th8cq6zv"
+        "assetId": "ks7dha3w7mhj8pj9nr9dehezrs8cqatj"
       },
       "transform": {
         "position": [
@@ -1248,10 +1326,10 @@
           "role": "canonical_model",
           "format": "glb",
           "contentType": "model/gltf-binary",
-          "filename": "propellant-tank-farm-th8cq6zv-original.glb",
+          "filename": "assembly-building-rs8cqatj-original.glb",
           "localPath": "public/assets/mint/desert-05/original_glb.glb",
           "loaderHint": "gltf",
-          "byteSize": 761044,
+          "byteSize": 707596,
           "extensionsUsed": [],
           "extensionsRequired": [],
           "usesDraco": false,
@@ -1267,10 +1345,10 @@
           "role": "preview_image",
           "format": "webp",
           "contentType": "image/webp",
-          "filename": "propellant-tank-farm-th8cq6zv-preview.webp",
+          "filename": "assembly-building-rs8cqatj-preview.webp",
           "localPath": "public/assets/mint/desert-05/preview_image.webp",
           "loaderHint": "image",
-          "byteSize": 57658
+          "byteSize": 49150
         }
       },
       "thumbnailUrl": "public/assets/mint/desert-05/preview_image.webp"
@@ -1280,7 +1358,7 @@
         "manifestVersion": 1,
         "kind": "asset",
         "assetType": "model",
-        "assetId": "ks79v3wffpsm6s0dh3z2jsnrc18cqmys"
+        "assetId": "ks7aav5yk2mz8ctb84gk43ywd98cpwmj"
       },
       "transform": {
         "position": [
@@ -1306,10 +1384,10 @@
           "role": "canonical_model",
           "format": "glb",
           "contentType": "model/gltf-binary",
-          "filename": "perimeter-blast-berm-c18cqmys-original.glb",
+          "filename": "shoreline-edge-d98cpwmj-original.glb",
           "localPath": "public/assets/mint/desert-06/original_glb.glb",
           "loaderHint": "gltf",
-          "byteSize": 749400,
+          "byteSize": 728072,
           "extensionsUsed": [],
           "extensionsRequired": [],
           "usesDraco": false,
@@ -1325,10 +1403,10 @@
           "role": "preview_image",
           "format": "webp",
           "contentType": "image/webp",
-          "filename": "perimeter-blast-berm-c18cqmys-preview.webp",
+          "filename": "shoreline-edge-d98cpwmj-preview.webp",
           "localPath": "public/assets/mint/desert-06/preview_image.webp",
           "loaderHint": "image",
-          "byteSize": 34736
+          "byteSize": 45476
         }
       },
       "thumbnailUrl": "public/assets/mint/desert-06/preview_image.webp"

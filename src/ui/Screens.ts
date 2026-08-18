@@ -1176,6 +1176,9 @@ export class Screens {
 
   renderLog(state: GameState): void {
     const card = this.card('log');
+    // The list scrolls, not the card, so Close stays reachable however long
+    // the voyage record gets.
+    card.classList.add('log-card');
     this.eyebrow(card, 'Ship’s log');
     this.title(card, 'Voyage record');
 

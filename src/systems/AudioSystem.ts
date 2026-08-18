@@ -16,6 +16,8 @@ export class AudioSystem {
   private humSource: AudioBufferSourceNode | null = null;
   private humGain: GainNode | null = null;
   private buffers = new Map<string, AudioBuffer>();
+  private roarSource: AudioBufferSourceNode | null = null;
+  private roarGain: GainNode | null = null;
   private pendingUrls = new Map<string, string>();
   private unlocked = false;
   private muted = false;
@@ -92,6 +94,72 @@ export class AudioSystem {
     this.humGain.gain.linearRampToValueAtTime(0.32, this.context.currentTime + 1.6);
   }
 
+  /**
+   * Start the launch engine roar.
+   *
+   * Separate from the travel ambience: this is the only place the game is loud,
+   * and it has its own gain so the ascent can duck as the air thins without
+   * touching the drive hum that plays for the rest of the crossing.
+   */
+  startLaunchRoar(): void {
+    if (!this.context || !this.master || this.roarSource) return;
+
+    // The ignition one-shot fires alongside the loop rather than before it, so
+    // the roar is already at full power when the clamps release.
+    const ignition = this.buffers.get('audio-launch-ignition');
+    if (ignition) {
+      const source = this.context.createBufferSource();
+      const gain = this.context.createGain();
+      gain.gain.value = this.muted ? 0 : 0.75;
+      source.buffer = ignition;
+      source.connect(gain).connect(this.master);
+      source.start();
+    }
+
+    const buffer = this.buffers.get('audio-launch-roar');
+    if (!buffer) return;
+
+    this.roarGain = this.context.createGain();
+    this.roarGain.gain.value = 0;
+    this.roarGain.connect(this.master);
+
+    this.roarSource = this.context.createBufferSource();
+    this.roarSource.buffer = buffer;
+    this.roarSource.loop = true;
+    this.roarSource.connect(this.roarGain);
+    this.roarSource.start();
+  }
+
+  /**
+   * @param throttle 0-1 engine power.
+   * @param airDensity 0-1. Sound needs air to carry, so the roar thins out as
+   *   the vehicle climbs and is almost gone by the time it is in vacuum.
+   */
+  setLaunchIntensity(throttle: number, airDensity: number): void {
+    if (!this.context || !this.roarGain) return;
+    const t = Math.max(0, Math.min(1, throttle));
+    const air = Math.max(0, Math.min(1, airDensity));
+    const target = this.muted ? 0 : (0.18 + t * 0.62) * (0.12 + air * 0.88);
+    this.roarGain.gain.setTargetAtTime(target, this.context.currentTime, 0.25);
+  }
+
+  stopLaunchRoar(): void {
+    if (!this.context || !this.roarSource) return;
+    const source = this.roarSource;
+    const gain = this.roarGain;
+    this.roarSource = null;
+    this.roarGain = null;
+    // Ramp down rather than cutting, then stop once the ramp has run.
+    gain?.gain.setTargetAtTime(0, this.context.currentTime, 0.3);
+    setTimeout(() => {
+      try {
+        source.stop();
+      } catch {
+        // Already stopped; nothing to do.
+      }
+    }, 1200);
+  }
+
   /** Engine loudness tracks the burn rate. */
   setBurnIntensity(factor: number): void {
     if (!this.context || !this.humGain) return;
@@ -149,6 +217,9 @@ export class AudioSystem {
   }
 
   setMuted(muted: boolean): void {
+    if (muted && this.roarGain && this.context) {
+      this.roarGain.gain.setTargetAtTime(0, this.context.currentTime, 0.1);
+    }
     this.muted = muted;
     if (this.master && this.context) {
       this.master.gain.setTargetAtTime(muted ? 0 : 0.7, this.context.currentTime, 0.1);
@@ -160,6 +231,7 @@ export class AudioSystem {
   }
 
   dispose(): void {
+    this.stopLaunchRoar();
     this.humSource?.stop();
     this.humSource = null;
     this.humGain = null;

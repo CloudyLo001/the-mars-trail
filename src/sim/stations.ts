@@ -222,7 +222,7 @@ export function stationServices(state: GameState): StationService[] {
     {
       id: 'refit-cores',
       label: 'Refit the drive cores',
-      detail: 'Yard techs strip and rebuild every core to near-new wear.',
+      detail: 'Every core rebuilt to near-new.',
       credits: refitPrice,
       days: 3,
       available: state.inventory.credits >= refitPrice && state.ship.driveCores > 0,
@@ -230,7 +230,7 @@ export function stationServices(state: GameState): StationService[] {
     {
       id: 'hull-repair',
       label: 'Pressure-test and reweld the hull',
-      detail: 'Restores hull integrity and replaces failed seals.',
+      detail: 'Hull back to full.',
       credits: hullPrice,
       days: 4,
       available: state.inventory.credits >= hullPrice && state.ship.hullIntegrity < 100,
@@ -246,7 +246,7 @@ export function stationServices(state: GameState): StationService[] {
     {
       id: 'medical',
       label: 'Station infirmary',
-      detail: 'Treats every active illness aboard and flushes accumulated dose.',
+      detail: 'Treats all illness, flushes dose.',
       credits: Math.round(110 * stationMarkup(state)),
       days: 4,
       available:
@@ -314,21 +314,21 @@ export function campOptions(state: GameState): CampOption[] {
     {
       id: 'hygiene',
       label: 'Run a hygiene cycle',
-      detail: 'Full water cycle, clean garments, scrubbed filters. Restores hygiene across the crew.',
+      detail: 'Restores hygiene. Costs water.',
       days: 2,
       available: state.inventory.waterL >= 60,
     },
     {
       id: 'hydroponics',
       label: 'Tend the hydroponics',
-      detail: 'A day in the rack. Yields rations and does the crew good to see something growing.',
+      detail: 'Yields rations, lifts morale.',
       days: 2,
       available: true,
     },
     {
       id: 'maintenance',
       label: 'Drive maintenance',
-      detail: 'Strip, clean, and re-seat the cores. Rolls back accumulated wear.',
+      detail: 'Rolls back core wear. The habit that decides most runs.',
       days: 3,
       available: state.ship.driveCores > 0,
     },
@@ -342,7 +342,7 @@ export function campOptions(state: GameState): CampOption[] {
     {
       id: 'rest',
       label: 'Stand down and rest',
-      detail: 'No burn, no work, no watch rotation. Energy and morale recover.',
+      detail: 'Energy and morale recover.',
       days: 4,
       available: true,
     },

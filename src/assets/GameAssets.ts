@@ -162,7 +162,10 @@ export class GameAssets {
       }
     }
 
-    for (const key of ['audio-drive-hum', 'audio-klaxon']) {
+    // Every audio asset in the registry, not a hard-coded pair: a new sound
+    // added to the registry would otherwise sync to disk and then silently
+    // never load.
+    for (const key of assetKeysWithPrefix('audio-')) {
       const url = artifactUrl(key, 'audio');
       if (url) {
         this.audioUrls.set(key, url);

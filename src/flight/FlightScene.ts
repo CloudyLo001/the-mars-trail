@@ -36,10 +36,10 @@ const WHITE = new THREE.Color('#ffffff');
  * gradient would blend them into mush and lose that.
  */
 const ASCENT_SKY: Array<{ upTo: number; color: string; ground: string }> = [
-  { upTo: 0.14, color: '#5f93bb', ground: '#a8875c' },
-  { upTo: 0.3, color: '#427ba8', ground: '#8f7049' },
-  { upTo: 0.46, color: '#2f5f8e', ground: '#75593c' },
-  { upTo: 0.62, color: '#2b5a97', ground: '#7d6446' },
+  { upTo: 0.14, color: '#5f93bb', ground: '#6d7f55' },
+  { upTo: 0.3, color: '#427ba8', ground: '#5c6c49' },
+  { upTo: 0.46, color: '#2f5f8e', ground: '#4a563c' },
+  { upTo: 0.62, color: '#2b5a97', ground: '#3d4733' },
   { upTo: 0.78, color: '#173463', ground: '#5a4832' },
   { upTo: 0.9, color: '#0a1733', ground: '#332a1e' },
   { upTo: 1.01, color: '#05070f', ground: '#14110c' },
@@ -168,7 +168,7 @@ export class FlightScene {
     const grounded = config.id === 'launch' || config.id === 'mars-descent';
     this.ground.visible = grounded;
     if (grounded) {
-      this.groundMaterial.color.set(config.id === 'launch' ? '#c9a978' : '#a2542a');
+      this.groundMaterial.color.set(config.id === 'launch' ? '#6d7f55' : '#a2542a');
     }
 
     this.clearPad();
@@ -197,23 +197,23 @@ export class FlightScene {
   private buildPad(props: THREE.Object3D[]): void {
     if (props.length === 0) return;
 
-    // desert-01..06 in key order. Index 2 is the tileable ground slab and is
-    // deliberately unused: the scene already has a ground plane, and dropping a
-    // second slab in leaves a plate hanging in the sky.
+    // Coastal complex, desert-01..06 in key order. Index 2 is the tileable
+    // ground slab and stays unused: the scene already has a ground plane, and
+    // a second slab would hang in the sky.
     const PAD = 0;
     const GANTRY = 1;
-    const MESA = 3;
-    const TANKS = 4;
-    const BERM = 5;
+    const HILLS = 3;
+    const ASSEMBLY = 4;
+    const SHORE = 5;
 
     const layout: Array<{ index: number; pos: [number, number, number]; scale: number; rotY?: number }> = [
       { index: PAD, pos: [0, -5.6, 0], scale: 4.5 },
       { index: GANTRY, pos: [-6.5, -3.4, -1], scale: 5.5 },
-      { index: TANKS, pos: [13, -5, -14], scale: 4 },
-      { index: BERM, pos: [-15, -5.2, -22], scale: 6, rotY: 0.2 },
-      { index: MESA, pos: [0, -6, -150], scale: 46 },
-      { index: MESA, pos: [-90, -6, -190], scale: 52, rotY: 0.6 },
-      { index: MESA, pos: [95, -6, -175], scale: 44, rotY: -0.4 },
+      { index: ASSEMBLY, pos: [22, -5, -34], scale: 9 },
+      { index: SHORE, pos: [-40, -5.6, -60], scale: 20, rotY: 0.1 },
+      { index: HILLS, pos: [0, -6, -150], scale: 46 },
+      { index: HILLS, pos: [-90, -6, -190], scale: 52, rotY: 0.6 },
+      { index: HILLS, pos: [95, -6, -175], scale: 44, rotY: -0.4 },
     ];
 
     for (const entry of layout) {

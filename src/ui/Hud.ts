@@ -52,6 +52,9 @@ export class Hud {
   private readonly crewBar = this.element('#crew-bar');
   private readonly dotMatrix = this.element('#dot-matrix');
   private readonly controls = this.element('#travel-controls');
+  private readonly marsFill = this.element('#mars-fill');
+  private readonly marsMarker = this.element('#mars-marker');
+  private readonly marsValue = this.element('#mars-value');
   private readonly advanceButton = this.element('#btn-advance') as HTMLButtonElement;
   private readonly campButton = this.element('#btn-camp') as HTMLButtonElement;
 
@@ -111,7 +114,17 @@ export class Hud {
       .forEach((button) => (button.disabled = !enabled));
   }
 
-  update(state: GameState, readouts: { daysToNext: number; nextName: string; kmToNext: number }): void {
+  update(
+    state: GameState,
+    readouts: { daysToNext: number; nextName: string; kmToNext: number; crossing: number },
+  ): void {
+    // Overall distance to Mars, so the per-leg ticker always has a scale
+    // behind it. Without this the player only ever sees the next waypoint.
+    const crossing = Math.max(0, Math.min(1, readouts.crossing));
+    this.marsFill.style.width = `${crossing * 100}%`;
+    this.marsMarker.style.left = `${crossing * 100}%`;
+    this.marsValue.textContent = `${Math.round(crossing * 100)}%`;
+
     const date = missionDate(state.day);
     this.dateMonth.textContent = date.monthLabel;
     this.dateDay.textContent = String(date.day);

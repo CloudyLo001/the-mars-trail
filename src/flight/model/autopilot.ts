@@ -113,7 +113,18 @@ export function createAutopilot(
       const x = Math.max(-1, Math.min(1, (targetX - view.shipX) * gain - view.shipVX * damping));
       const y = Math.max(-1, Math.min(1, (targetY - view.shipY) * gain - view.shipVY * damping));
 
-      return { x, y, boost: false, brake: false };
+      // Drive the launch sequence too: without ignition and staging the bots
+    // would sit on the pad forever and every headless run would time out.
+    const stage = view.stage;
+    const launchInput = {
+      throttleUp: stage === 'ignition' || stage === 'boost' || stage === 'staged',
+      throttleDown: false,
+      ignitePressed: stage === 'pad',
+      stagePressed: stage === 'boost' && view.altitude > 150,
+    };
+
+    return {
+      ...launchInput, x, y, boost: false, brake: false };
     },
   };
 }

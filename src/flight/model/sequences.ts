@@ -14,11 +14,11 @@ export const SEQUENCES: Record<FlightSequenceId, FlightConfig> = {
     id: 'launch',
     title: 'Ascent',
     brief:
-      'The pad clears, the clamps release, and you ride it up. Once you are through the tower the ship is yours — hold your line through the debris on the way out. Nothing here can end the mission; fly it until you have it.',
+      'Ignite, throttle up, fly it off the pad. Stage the boosters when they burn out.',
     sceneKey: 'launch-ascent',
     family: 'asteroid',
     durationSeconds: 62,
-    leadInSeconds: 7,
+    leadInSeconds: 0,
     speed: 26,
     boostSpeed: 12,
     spawnDepth: 190,
@@ -39,8 +39,7 @@ export const SEQUENCES: Record<FlightSequenceId, FlightConfig> = {
   kessler: {
     id: 'kessler',
     title: 'Kessler Belt',
-    brief:
-      'Eighty years of dead satellites on crossing orbits. Dense, fast, and none of it is on the charts.',
+    brief: 'Eighty years of dead satellites on crossing orbits.',
     sceneKey: 'debris-belt',
     family: 'debris',
     durationSeconds: 30,
@@ -59,8 +58,7 @@ export const SEQUENCES: Record<FlightSequenceId, FlightConfig> = {
   'asteroid-fringe': {
     id: 'asteroid-fringe',
     title: 'The Rubble Shoal',
-    brief:
-      'Fewer rocks than the belt, but they are enormous and they do not move out of the way. Pick a side early and commit.',
+    brief: 'Fewer rocks than the belt, but they are enormous and they do not move out of the way.',
     sceneKey: 'asteroid-fringe',
     family: 'asteroid',
     durationSeconds: 32,
@@ -80,8 +78,7 @@ export const SEQUENCES: Record<FlightSequenceId, FlightConfig> = {
   'mars-descent': {
     id: 'mars-descent',
     title: 'Ares Basin Descent',
-    brief:
-      'Through the canyon and onto the pad. Fastest of the four, tightest of the four, and the last thing between you and the ground.',
+    brief: 'Through the canyon and onto the pad.',
     sceneKey: 'mars-descent',
     family: 'mars-surface',
     durationSeconds: 28,

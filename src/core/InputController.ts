@@ -16,6 +16,12 @@ export interface InputAxes {
   y: number;
   boost: boolean;
   brake: boolean;
+  /** Held throttle for the launch: W up, S down. */
+  throttleUp: boolean;
+  throttleDown: boolean;
+  /** True on the frame the key was pressed, then cleared. Launch sequence. */
+  ignitePressed: boolean;
+  stagePressed: boolean;
   /** True on the frame Escape was pressed, then cleared. */
   abortRequested: boolean;
 }
@@ -26,7 +32,13 @@ const RIGHT = new Set(['KeyD', 'ArrowRight']);
 const UP = new Set(['KeyW', 'ArrowUp']);
 const DOWN = new Set(['KeyS', 'ArrowDown']);
 const BOOST = new Set(['ShiftLeft', 'ShiftRight']);
-const BRAKE = new Set(['Space', 'ControlLeft']);
+const BRAKE = new Set(['ControlLeft', 'ControlRight']);
+
+/** Launch sequence keys, mirroring the reference rocket sim. */
+const THROTTLE_UP = new Set(['KeyW', 'ArrowUp']);
+const THROTTLE_DOWN = new Set(['KeyS', 'ArrowDown']);
+const IGNITE = new Set(['Enter', 'Space']);
+const STAGE = new Set(['KeyZ']);
 
 /** Keys we swallow while flying, so the page does not scroll under the player. */
 const SWALLOW = new Set([
@@ -35,6 +47,7 @@ const SWALLOW = new Set([
   'ArrowUp',
   'ArrowDown',
   'Space',
+  'Enter',
 ]);
 
 /** Axis smoothing rates. Attack is quicker than release, which feels responsive. */
@@ -45,6 +58,8 @@ export class InputController {
   private readonly held = new Set<string>();
   private attached = false;
   private abort = false;
+  private ignite = false;
+  private stage = false;
 
   /** Pointer steering, -1..1, only used once the pointer actually moves. */
   private pointerX = 0;
@@ -86,6 +101,8 @@ export class InputController {
     this.smoothedX = 0;
     this.smoothedY = 0;
     this.abort = false;
+    this.ignite = false;
+    this.stage = false;
   };
 
   private readonly onVisibility = (): void => {
@@ -98,6 +115,8 @@ export class InputController {
       this.abort = true;
       return;
     }
+    if (IGNITE.has(event.code)) this.ignite = true;
+    if (STAGE.has(event.code)) this.stage = true;
     this.held.add(event.code);
     // A keypress takes over from a resting mouse, so the two never fight.
     this.pointerActive = false;
@@ -149,13 +168,21 @@ export class InputController {
     this.smoothedY += (rawY - this.smoothedY) * (1 - Math.exp(-rate(rawY, this.smoothedY) * delta));
 
     const abortRequested = this.abort;
+    const ignitePressed = this.ignite;
+    const stagePressed = this.stage;
     this.abort = false;
+    this.ignite = false;
+    this.stage = false;
 
     return {
       x: this.smoothedX,
       y: this.smoothedY,
       boost: this.any(BOOST),
       brake: this.any(BRAKE),
+      throttleUp: this.any(THROTTLE_UP),
+      throttleDown: this.any(THROTTLE_DOWN),
+      ignitePressed,
+      stagePressed,
       abortRequested,
     };
   }

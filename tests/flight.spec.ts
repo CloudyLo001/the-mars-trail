@@ -63,6 +63,9 @@ test('the crossing begins on Earth with a playable ascent', async ({ page }, tes
   const snapshot = await page.evaluate(() => window.__THREE_GAME_TEST_HOOKS__?.flightSnapshot());
   expect(snapshot?.active).toBe(true);
   expect(snapshot?.sequence).toBe('launch');
+  // It starts held on the pad now, rather than already climbing.
+  expect(snapshot?.stage).toBe('pad');
+  expect(snapshot?.health).toBe(100);
 
   expect(await canvasIsLive(page), 'the launch scene must render').toBe(true);
 
@@ -72,86 +75,44 @@ test('the crossing begins on Earth with a playable ascent', async ({ page }, tes
   expect(pageErrors).toEqual([]);
 });
 
-test('the liftoff is scripted, then control hands over', async ({ page }) => {
-  test.setTimeout(240_000);
+test('the launch is a sequence the player flies', async ({ page }) => {
+  test.setTimeout(300_000);
   await bootGame(page);
   await page.evaluate(() => window.__THREE_GAME_TEST_HOOKS__?.startFlight('launch', 2091));
   await expect(page.locator('#flight-hud')).toBeVisible();
 
-  // During the scripted liftoff the player has no control at all.
-  const beforeX = (await page.evaluate(() => window.__THREE_GAME_TEST_HOOKS__?.flightSnapshot()))
-    ?.shipX;
-  await page.keyboard.down('KeyD');
-  await page.waitForTimeout(1500);
-  const duringX = (await page.evaluate(() => window.__THREE_GAME_TEST_HOOKS__?.flightSnapshot()))
-    ?.shipX;
-  await page.keyboard.up('KeyD');
-  expect(
-    Math.abs(duringX! - beforeX!),
-    `ship must not steer during the cutscene (${beforeX} -> ${duringX})`,
-  ).toBeLessThan(0.05);
+  const snap = () => page.evaluate(() => window.__THREE_GAME_TEST_HOOKS__?.flightSnapshot());
 
-  // Once the lead-in elapses, the same input must move the ship.
-  await expect
-    .poll(
-      async () =>
-        (await page.evaluate(() => window.__THREE_GAME_TEST_HOOKS__?.flightSnapshot()))?.cinematic,
-      { timeout: 90_000, intervals: [500] },
-    )
-    .toBe(false);
-
-  const handoverX = (await page.evaluate(() => window.__THREE_GAME_TEST_HOOKS__?.flightSnapshot()))
-    ?.shipX;
-  await page.keyboard.down('KeyD');
+  // It holds on the pad and does nothing until the player ignites.
   await page.waitForTimeout(1200);
+  let s = await snap();
+  expect(s?.stage, 'the vehicle must wait on the pad').toBe('pad');
+  expect(s?.altitude).toBe(0);
+  await expect(page.locator('#flight-prompt')).toContainText(/ignite/i);
+
+  // Steering does nothing while it is still clamped down.
+  await page.keyboard.down('KeyD');
+  await page.waitForTimeout(900);
   await page.keyboard.up('KeyD');
-  const afterX = (await page.evaluate(() => window.__THREE_GAME_TEST_HOOKS__?.flightSnapshot()))
-    ?.shipX;
-  expect(afterX!, `ship should steer after handover (${handoverX} -> ${afterX})`).toBeGreaterThan(
-    handoverX! + 0.3,
-  );
-});
+  s = await snap();
+  expect(Math.abs(s?.shipX ?? 0), 'no steering on the pad').toBeLessThan(0.05);
 
-test('the ascent always reaches orbit, however badly it is flown', async ({ page }) => {
-  test.setTimeout(240_000);
-  await bootGame(page);
+  // Ignition alone is not enough: it needs thrust-to-weight above one.
+  await page.keyboard.press('Space');
+  await page.waitForTimeout(500);
+  s = await snap();
+  expect(s?.stage, 'ignition should not lift it on its own').toBe('ignition');
 
-  // This has to go through the real departure path: the raw startFlight hook
-  // skips the launch's own outcome handling, which is the thing under test.
-  await page.getByRole('button', { name: /begin the crossing/i }).click();
-  await page.getByRole('button', { name: /corporate financier/i }).click();
-  await page.getByRole('button', { name: /to the outfitters/i }).click();
-  const buy = async (item: string, times: number) => {
-    const row = page.locator('.store-row').filter({ hasText: item });
-    for (let i = 0; i < times; i += 1) await row.getByRole('button', { name: /^Buy /i }).click();
-  };
-  await buy('Drive Cores', 2);
-  await buy('Rations', 2);
-  await buy('Water', 1);
-  await page.getByRole('button', { name: /leave the yard/i }).click();
-
-  await expect(page.locator('#flight-hud')).toBeVisible();
-
-  // Fly it as badly as the harness can. The ascent must still hand the player
-  // to the crossing rather than bouncing them back to the pad.
-  await page.evaluate(() => window.__THREE_GAME_TEST_HOOKS__?.setFlightAutopilot(0.02));
-  await page.evaluate(() => window.__THREE_GAME_TEST_HOOKS__?.fastForwardFlight(75));
-
+  // Hold the throttle and it climbs.
+  await page.keyboard.down('KeyW');
   await expect
-    .poll(
-      async () =>
-        (await page.evaluate(() => window.__THREE_GAME_TEST_HOOKS__?.flightSnapshot()))?.active,
-      { timeout: 30_000, intervals: [250] },
-    )
-    .toBe(false);
-
-  await expect(page.locator('.card-title')).toHaveText(/orbit achieved/i);
-
-  // And it leads into the crossing rather than another ascent.
-  await page.getByRole('button', { name: /continue|onward|proceed|▸/i }).first().click();
-  await expect
-    .poll(async () => page.evaluate(() => window.__THREE_GAME_DIAGNOSTICS__?.phase))
-    .toBe('leg-select');
+    .poll(async () => (await snap())?.stage, { timeout: 120_000, intervals: [500] })
+    .toBe('boost');
+  await page.waitForTimeout(1500);
+  s = await snap();
+  await page.keyboard.up('KeyW');
+  expect(s?.twr ?? 0, 'thrust-to-weight must exceed one to fly').toBeGreaterThan(1);
+  expect(s?.altitude ?? 0, 'it should be climbing').toBeGreaterThan(0);
 });
 
 test('the ship responds to real keyboard input', async ({ page }) => {

@@ -93,8 +93,8 @@ export function hazardOptions(state: GameState, waypoint: Waypoint): HazardOptio
       id: 'burn',
       label: isFinale ? 'Commit to the descent' : 'Burn straight through',
       detail: isFinale
-        ? 'One pass, full commitment. Everything rides on the heat shield.'
-        : 'Fastest line. No propellant, no days, no margin.',
+        ? 'One pass. Everything rides on the heat shield.'
+        : 'Fast, free, no margin.',
       riskMultiplier: 1,
       days: 0,
       propellantCells: 0,
@@ -105,8 +105,8 @@ export function hazardOptions(state: GameState, waypoint: Waypoint): HazardOptio
       id: 'creep',
       label: isFinale ? 'Multi-pass aerobrake' : 'Creep through on thrusters',
       detail: isFinale
-        ? 'Shed velocity over several passes. Gentler on the shield, harder on the calendar.'
-        : 'Slow, deliberate, constant corrections. Costs days and propellant.',
+        ? 'Several passes. Kinder to the shield, costs days.'
+        : 'Slow and safe. Costs days and propellant.',
       riskMultiplier: 0.45,
       days: 3,
       propellantCells: creepCells,
@@ -118,7 +118,7 @@ export function hazardOptions(state: GameState, waypoint: Waypoint): HazardOptio
       id: 'escort',
       label: isFinale ? 'Buy a colony talkdown' : 'Hire a tug escort',
       detail: isFinale
-        ? 'Ares Basin flies you in on their beam. Expensive and very nearly safe.'
+        ? 'They fly you in. Expensive, near-safe.'
         : 'A cleared lane and someone else\'s radar. Expensive and very nearly safe.',
       riskMultiplier: 0.16,
       days: 1,
@@ -130,7 +130,7 @@ export function hazardOptions(state: GameState, waypoint: Waypoint): HazardOptio
     {
       id: 'hold',
       label: 'Hold for a clean window',
-      detail: 'Station-keep until the geometry improves. Costs only days — but days are the deadline.',
+      detail: 'Wait it out. Costs only days.',
       riskMultiplier: 0.3,
       days: 6,
       propellantCells: 2,

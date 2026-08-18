@@ -31,6 +31,7 @@ export function scoreFlight(stats: FlightStats, config: FlightConfig): FlightRun
   return {
     sequence: config.id,
     completed: stats.completed,
+    destroyed: Boolean(stats.destroyed),
     performance,
     hits: stats.hits,
     grazes: stats.grazes,
