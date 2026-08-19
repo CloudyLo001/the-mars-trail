@@ -160,26 +160,30 @@ export const PALETTES: Record<string, ScenePalette> = {
 
   'launch-ascent': {
     key: 'launch-ascent',
-    // Daylight at the pad, thinning toward black as the ship climbs. The
-    // FlightScene lerps these toward 'debris-belt' as altitude builds, which is
-    // what sells leaving the atmosphere.
-    skyTop: '#1d4f96',
-    skyMid: '#5fa4d8',
-    skyBottom: '#bcd9e8',
-    farLayer: '#7ba6c4',
-    midLayer: '#53748f',
-    nearLayer: '#33485c',
-    fog: '#8fb6d0',
-    fogNear: 60,
-    fogFar: 260,
-    sunColor: '#fff6e0',
-    sunIntensity: 4.6,
-    hemiSky: '#bcdcf5',
-    hemiGround: '#6d6350',
-    hemiIntensity: 2.6,
-    sunPosition: [10, 14, 8],
+    // Dawn over a dry lakebed, darkening to black as the ship climbs. The sun
+    // sits low and warm so the complex casts long raking shadows across the
+    // pan; the fill is cold, which is what makes the light read as sunrise
+    // rather than as an overcast noon.
+    skyTop: '#20305e',
+    skyMid: '#7a6a8e',
+    skyBottom: '#d8a071',
+    farLayer: '#9a7c74',
+    midLayer: '#6b5450',
+    nearLayer: '#3d3029',
+    fog: '#c08a63',
+    fogNear: 70,
+    fogFar: 320,
+    sunColor: '#ffb877',
+    sunIntensity: 2.5,
+    hemiSky: '#8ea6c8',
+    hemiGround: '#6a4a30',
+    hemiIntensity: 1.4,
+    // Low and to the side. Low enough for long raking shadows, high enough
+    // that a flat pan still catches light — at a true grazing angle the lakebed
+    // went black and the whole site read as night.
+    sunPosition: [18, 6.5, 9],
     starDensity: 0,
-    particleColor: '#eaf3fb',
+    particleColor: '#f0d2b0',
     particleDensity: 0.5,
   },
 

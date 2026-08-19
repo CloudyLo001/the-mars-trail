@@ -115,6 +115,32 @@ test('the launch is a sequence the player flies', async ({ page }) => {
   expect(s?.altitude ?? 0, 'it should be climbing').toBeGreaterThan(0);
 });
 
+test('the rocket sits on the ground, then Space alone launches it', async ({ page }) => {
+  test.setTimeout(240_000);
+  await bootGame(page);
+  await page.evaluate(() => window.__THREE_GAME_TEST_HOOKS__?.startFlight('launch', 2091));
+  await expect(page.locator('#flight-hud')).toBeVisible();
+  const snap = () => page.evaluate(() => window.__THREE_GAME_TEST_HOOKS__?.flightSnapshot());
+
+  // Nothing may move while it waits. The ground used to sink on a wall clock,
+  // so the pad drifted away beneath a stationary rocket.
+  await page.waitForTimeout(2500);
+  let s = await snap();
+  expect(s?.altitude, 'altitude must be zero on the pad').toBe(0);
+  expect(s?.climb, 'the ground must not move before the rocket does').toBe(0);
+
+  // One press, then hands off entirely: it must still leave the pad.
+  await page.keyboard.press('Space');
+  await page.evaluate(() => window.__THREE_GAME_TEST_HOOKS__?.fastForwardFlight(12));
+  s = await snap();
+  expect(
+    ['boost', 'staged', 'flying'],
+    `stage after Space with no other input was ${s?.stage}`,
+  ).toContain(s?.stage);
+  expect(s?.altitude ?? 0, 'it must climb without the throttle held').toBeGreaterThan(0);
+  expect(s?.climb ?? 0, 'the ground should now be falling away').toBeGreaterThan(0);
+});
+
 test('the ship responds to real keyboard input', async ({ page }) => {
   // Booting plus a corridor of ~48 cloned models renders slowly without a GPU.
   test.setTimeout(240_000);

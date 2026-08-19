@@ -14,7 +14,13 @@ export type FlightSequenceId = 'launch' | 'kessler' | 'asteroid-fringe' | 'mars-
  * Where the launch has got to. Only the ascent uses these; every other
  * sequence starts already flying.
  */
-export type LaunchStage = 'pad' | 'ignition' | 'boost' | 'staged' | 'flying';
+export type LaunchStage =
+  /** Standing on the pad, waiting to be ignited. Where every ascent opens. */
+  | 'pad'
+  | 'ignition'
+  | 'boost'
+  | 'staged'
+  | 'flying';
 
 export interface FlightInput {
   /** Lateral steering, -1 (left) to 1 (right). */
@@ -125,10 +131,23 @@ export interface FlightRunView {
   throttle: number;
   /** Thrust-to-weight. Below 1 the vehicle stays on the pad. */
   twr: number;
-  /** Metres climbed during the boost phase. */
+  /** Metres climbed. Monotonic across the whole ascent. */
   altitude: number;
+  /**
+   * 0-1 of the full ascent, derived from altitude rather than elapsed time.
+   * Every launch visual keys off this so nothing moves until the rocket does.
+   */
+  climb: number;
   /** 0-100 hull health. Reaching zero ends the ascent. */
   health: number;
+  /**
+   * 0-1 through the opening camera move onto the pad. Purely a framing value:
+   * the vehicle is on the pad and ignitable from the first frame, so this
+   * never gates anything the player can do.
+   */
+  prelaunch: number;
+  /** True for a few seconds once the obstacle field arrives. */
+  hazardWarning: boolean;
   /** 0-1 through the scripted opening. 1 once the player has control. */
   liftoff: number;
   finished: boolean;

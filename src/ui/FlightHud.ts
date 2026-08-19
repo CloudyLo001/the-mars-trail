@@ -17,6 +17,7 @@ export class FlightHud {
   private readonly hits = this.element('#flight-hits');
   private readonly health = this.element('#flight-health');
   private readonly prompt = this.element('#flight-prompt');
+  private readonly sign = this.element('#flight-sign');
   private readonly hint = this.element('#flight-hint');
 
   private lastHits = -1;
@@ -43,6 +44,10 @@ export class FlightHud {
 
     // With the camera on the nose there is no horizon to judge the lane
     // against, so the warning has to say which way back.
+    // Called out the moment the field arrives, because the transition from an
+    // empty sky to a corridor full of rock is otherwise unannounced.
+    this.sign.hidden = !view.hazardWarning;
+
     // Hull health, as a bar rather than a number to infer from impacts.
     this.health.style.width = `${Math.max(0, view.health)}%`;
     this.health.style.background =
@@ -51,7 +56,7 @@ export class FlightHud {
     // The launch is a sequence, so it tells you what it wants next.
     const prompts: Record<string, string> = {
       pad: 'PRESS SPACE TO IGNITE',
-      ignition: 'HOLD W — THROTTLE UP',
+      ignition: 'LIFTING — HOLD W TO CLIMB FASTER',
       boost: view.altitude > 120 ? 'PRESS Z — STAGE' : 'HOLD W',
       staged: '',
       flying: '',

@@ -99,6 +99,9 @@ interface ThreeGameTestHooks {
     twr?: number;
     altitude?: number;
     health?: number;
+    climb?: number;
+    prelaunch?: number;
+    hazardWarning?: boolean;
   };
   /** Abandon the live sequence. */
   abortFlight(): void;

@@ -52,6 +52,8 @@ export class Game {
   private readonly input: InputController;
   /** Non-null while a real-time sequence owns the screen. */
   private flight: FlightController | null = null;
+  /** True once the ascent's engine roar has been started, at ignition. */
+  private roarLit = false;
   /** Set by the test hook so a sequence can be replayed deterministically. */
   private flightSeedOverride: number | null = null;
   private readonly loop: Loop;
@@ -423,6 +425,14 @@ export class Game {
     if (vehicle) this.flight.setShipModel(vehicle.clone(true));
 
     this.pipeline.setSceneAndCamera(this.flight.scene.scene, this.flight.scene.chase.camera);
+    if (sequence === 'launch') {
+      // Daylight over a pale desert complex is the brightest thing in the game,
+      // and at the shared threshold every lit roof and concrete apron picked up
+      // a halo. Lifting the threshold keeps the bloom for what is actually hot
+      // — the engine plume — and takes it off everything that is merely white.
+      this.pipeline.setBloomThreshold(0.94);
+      this.pipeline.setBloomStrength(0.2);
+    }
     this.flight.resize(this.canvas.clientWidth / Math.max(1, this.canvas.clientHeight));
     this.input.attach();
 
@@ -434,14 +444,19 @@ export class Game {
     if (sequence === 'launch') {
       // The ascent is the one moment the game is loud. The drive ambience is
       // silenced under it so the two engine beds do not fight.
+      //
+      // The roar itself waits for ignition rather than starting with the
+      // sequence: engines at full power while the stack is still clamped to
+      // the pad is the audio version of the rocket already being in the sky.
       this.audio.setBurnIntensity(0);
-      this.audio.startLaunchRoar();
+      this.roarLit = false;
     } else {
       this.audio.play('hazard');
     }
   }
 
   private endFlight(result: FlightRunResult, onComplete: (r: FlightRunResult) => void): void {
+    this.pipeline.restoreBloom();
     this.audio.stopLaunchRoar();
     this.input.detach();
     this.flightHud.setVisible(false);
@@ -695,6 +710,12 @@ export class Game {
         const view = this.flight.view;
         this.flightHud.update(view);
         if (this.flight.sequence === 'launch') {
+          // Silence on the pad; the ignition one-shot and the roar loop both
+          // fire on the same frame the engines catch.
+          if (!this.roarLit && view.stage !== 'pad') {
+            this.roarLit = true;
+            this.audio.startLaunchRoar();
+          }
           // Throttle climbs off the pad, and the roar thins as the atmosphere
           // does — by the top of the climb there is almost no air to carry it.
           const throttle = view.cinematic ? 0.25 + view.liftoff * 0.75 : 1;
@@ -801,6 +822,15 @@ export class Game {
         this.flightSeedOverride = seed;
         this.beginFlight(sequence as FlightSequenceId, () => this.renderPhase(true));
         this.flightSeedOverride = null;
+        // Stream the same families departing normally would, or a sequence
+        // started from a test would fly over bare ground and a screenshot of
+        // it would not be a screenshot of the game.
+        void this.assets.ensureFamilies(['desert', 'asteroid']).then(() => {
+          if (this.flight?.sequence === 'launch') {
+            this.flight.setPadProps(this.assets.desert);
+            this.flight.setObstacleProps(this.assets.asteroids);
+          }
+        });
       },
       setFlightAutopilot: (skill: number | null) => {
         this.flight?.setAutopilot(skill);
@@ -823,6 +853,9 @@ export class Game {
           twr: view.twr,
           altitude: view.altitude,
           health: view.health,
+          climb: view.climb,
+          prelaunch: view.prelaunch,
+          hazardWarning: view.hazardWarning,
         };
       },
       abortFlight: () => {

@@ -9,6 +9,7 @@
  */
 
 import * as THREE from 'three';
+import { createGlowTexture } from './glow';
 
 /** Spacing between drive cores along the tow line. */
 const CORE_SPACING = 1.5;
@@ -28,8 +29,8 @@ export class ShipRig {
   private hullModel: THREE.Object3D | null = null;
   private coreModel: THREE.Object3D | null = null;
   private coreInstances: THREE.Object3D[] = [];
-  private plumes: THREE.Mesh[] = [];
-  private readonly plumeMaterial: THREE.MeshBasicMaterial;
+  private plumes: THREE.Sprite[] = [];
+  private readonly plumeMaterial: THREE.SpriteMaterial;
 
   private visibleCores = 0;
   private bobTime = 0;
@@ -40,15 +41,16 @@ export class ShipRig {
     this.group.add(this.coreHost);
     this.group.add(this.plumeHost);
 
-    // Thruster plumes are additive unlit quads: cheap, and they posterise into
-    // hard bands which is exactly the look the reference VFX has.
-    this.plumeMaterial = new THREE.MeshBasicMaterial({
-      color: '#8fe4ff',
+    // A soft glow at the engines rather than hard additive quads. The ship
+    // coasts for most of the crossing, so this is a hint of power, not a
+    // full exhaust plume; the old rectangles read as debris stuck to the hull.
+    this.plumeMaterial = new THREE.SpriteMaterial({
+      map: createGlowTexture(),
+      color: '#9fe8ff',
       transparent: true,
-      opacity: 0.75,
-      blending: THREE.AdditiveBlending,
+      opacity: 0.5,
       depthWrite: false,
-      fog: false,
+      blending: THREE.AdditiveBlending,
     });
   }
 
@@ -112,19 +114,18 @@ export class ShipRig {
   private buildPlumes(): void {
     for (const plume of this.plumes) {
       this.plumeHost.remove(plume);
-      plume.geometry.dispose();
+      // Sprites share one global geometry — disposing it here would break
+      // every other sprite in the app, including the cloud deck.
     }
     this.plumes = [];
 
-    for (let i = 0; i < 4; i += 1) {
-      const plume = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 0.28), this.plumeMaterial);
+    for (let i = 0; i < 1; i += 1) {
+      const plume = new THREE.Sprite(this.plumeMaterial);
+      plume.scale.set(2.4, 1.5, 1);
       plume.position.set(
-        // The ascender is fitted to 4.2 units long, so its tail sits about 2.1
-        // behind the hull centre. At the old offset the quads were buried in
-        // the body with only their tips showing past the nose.
-        HULL_POSITION.x + 2.95,
-        HULL_POSITION.y - 0.35 + i * 0.24,
-        0.05 + i * 0.01,
+        HULL_POSITION.x + 2.5,
+        HULL_POSITION.y + 0.05,
+        0.2,
       );
       this.plumeHost.add(plume);
       this.plumes.push(plume);
@@ -148,14 +149,14 @@ export class ShipRig {
       instance.rotation.z = Math.sin(this.bobTime * 0.8 + index) * 0.03;
     });
 
-    // Plumes flicker per-frame and scale with the burn rate.
-    const base = 0.35 + burnFactor * 1.5;
+    // The glow breathes with the burn rate rather than stretching into a
+    // plume: a hint that the engines are lit, not a full exhaust.
+    const size = 1.5 + burnFactor * 1.4;
     this.plumes.forEach((plume, index) => {
-      const flicker = 0.82 + Math.sin(elapsed * 22 + index * 2.1) * 0.18;
-      plume.scale.set(base * flicker, 0.7 + burnFactor * 0.5, 1);
-      plume.position.x = HULL_POSITION.x + 1.2 + (base * flicker) / 2;
+      const flicker = 0.9 + Math.sin(elapsed * 9 + index * 2.1) * 0.1;
+      plume.scale.set(size * flicker, size * 0.75 * flicker, 1);
     });
-    this.plumeMaterial.opacity = 0.32 + burnFactor * 0.5;
+    this.plumeMaterial.opacity = 0.22 + burnFactor * 0.38;
   }
 
   dispose(): void {

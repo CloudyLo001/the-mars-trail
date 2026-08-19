@@ -31,6 +31,9 @@ const RETRO_REFERENCE_HEIGHT = 270;
  */
 const MAX_ASPECT = 2.85;
 
+/** Luminance a pixel must clear before it blooms, unless a scene overrides it. */
+const DEFAULT_BLOOM_THRESHOLD = 0.72;
+
 export interface PixelPipelineOptions {
   bloomStrength?: number;
   bloomRadius?: number;
@@ -73,7 +76,7 @@ export class PixelPipeline {
       this.internalSize.clone(),
       options.bloomStrength ?? 0.42,
       options.bloomRadius ?? 0.5,
-      options.bloomThreshold ?? 0.72,
+      options.bloomThreshold ?? DEFAULT_BLOOM_THRESHOLD,
     );
     this.composer.addPass(this.bloomPass);
 
@@ -115,6 +118,23 @@ export class PixelPipeline {
 
   setBloomStrength(value: number): void {
     this.bloomPass.strength = value;
+  }
+
+  /**
+   * Luminance a pixel has to reach before it blooms.
+   *
+   * Raise it to stop lit-but-not-emissive surfaces — a white building in
+   * daylight — from wearing a halo, while leaving genuinely hot things like an
+   * engine plume glowing.
+   */
+  setBloomThreshold(value: number): void {
+    this.bloomPass.threshold = THREE.MathUtils.clamp(value, 0, 1);
+  }
+
+  /** Put bloom back to whatever the current retro setting asks for. */
+  restoreBloom(): void {
+    this.bloomPass.strength = this.retroEnabled ? 0.42 : 0.28;
+    this.bloomPass.threshold = DEFAULT_BLOOM_THRESHOLD;
   }
 
   /**

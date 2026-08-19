@@ -35,6 +35,7 @@ export class ChaseCamera {
   private readonly target = new THREE.Vector3();
   private readonly lookTarget = new THREE.Vector3();
   private shake = 0;
+  private rumble = 0;
   private roll = 0;
   private fov = BASE_FOV;
   /** Upward tilt in world units added to the look target. */
@@ -42,6 +43,7 @@ export class ChaseCamera {
   /** 1 = pad shot, 0 = tucked in behind. Only used in launch mode. */
   private launchFraming = 1;
   private launchMode = false;
+  private prelaunch = 1;
 
   constructor() {
     this.camera.position.copy(OFFSET);
@@ -70,6 +72,14 @@ export class ChaseCamera {
     this.launchMode = true;
   }
 
+  /**
+   * Pre-launch camera pass, 0-1. Tracks across the complex and settles onto
+   * the pad shot, so the site is seen before anything happens.
+   */
+  setPrelaunch(t: number): void {
+    this.prelaunch = Math.max(0, Math.min(1, t));
+  }
+
   clearLaunchFraming(): void {
     this.launchMode = false;
   }
@@ -79,13 +89,26 @@ export class ChaseCamera {
     this.shake = Math.min(1.2, this.shake + strength);
   }
 
+  /**
+   * Sustained vibration, 0-1, held for as long as it is set.
+   *
+   * Distinct from `impulse`, which is a single decaying kick. Engines running
+   * are a continuous event, so they need a continuous shake — a string of
+   * impulses would pulse at whatever rate they were fired.
+   */
+  setRumble(amount: number): void {
+    this.rumble = Math.max(0, Math.min(1, amount));
+  }
+
   reset(): void {
     this.shake = 0;
+    this.rumble = 0;
     this.roll = 0;
     this.fov = BASE_FOV;
     this.pitch = 0;
     this.launchFraming = 1;
     this.launchMode = false;
+    this.prelaunch = 1;
     this.camera.position.copy(OFFSET);
     this.camera.rotation.set(0, 0, 0);
     this.camera.fov = BASE_FOV;
@@ -98,13 +121,20 @@ export class ChaseCamera {
     if (this.launchMode) {
       const w = this.launchFraming;
 
-      // Pad shot stands off to the side and below. The flying shot sits on top
-      // of the vehicle near the nose, so its tip is in shot and the body is not
-      // in the way.
+      // Pad shot stands off to one side, a little above the deck, looking back
+      // at the vehicle. The flying shot sits on top of it near the nose, so the
+      // tip is in shot and the body is not in the way.
+      //
+      // `pass` opens the pad shot out for the first few seconds and then closes
+      // it in. It stays close enough throughout that the rocket reads as
+      // standing on a launch pad rather than as a speck over open country, and
+      // high enough that the ground plane is not edge-on — level with it the
+      // plane vanishes, and below it the plane is backface-culled away.
+      const pass = 1 - this.prelaunch;
       this.target.set(
-        view.shipX + w * 8.5,
-        view.shipY + (1 - w) * FLYING_LIFT - w * 6.3,
-        FLYING_BACK + w * (PAD_BACK - FLYING_BACK),
+        view.shipX + w * (9 + pass * 13),
+        view.shipY + (1 - w) * FLYING_LIFT - w * (1.2 - pass * 2.6),
+        FLYING_BACK + w * (PAD_BACK - FLYING_BACK) + pass * 16,
       );
       // Lag hard during the pad shot so the rocket visibly pulls away from the
       // camera, then track tightly once the player is flying it.
@@ -115,7 +145,9 @@ export class ChaseCamera {
       // the corridor fills the rest; angled up at the vehicle on the pad.
       this.lookTarget.set(
         view.shipX * (1 - w * 0.4) + view.shipVX * 0.25 * (1 - w),
-        view.shipY + (1 - w) * FLYING_LIFT + w * 3.4,
+        // Aimed at the vehicle rather than well above it, so the pad and the
+        // gantry it is standing on stay in the bottom of the frame.
+        view.shipY + (1 - w) * FLYING_LIFT + w * 0.6,
         w * -2 + (1 - w) * -LOOK_AHEAD,
       );
       this.camera.lookAt(this.lookTarget);
@@ -140,9 +172,14 @@ export class ChaseCamera {
 
       if (this.shake > 0.001) {
         this.shake *= Math.exp(-5 * delta);
-        const amount = this.shake * 0.35;
+      }
+      // One jitter for both sources, so a hit during the burn does not read as
+      // two shakes fighting each other.
+      const amount = this.shake * 0.35 + this.rumble * 0.09;
+      if (amount > 0.001) {
         this.camera.position.x += (Math.random() - 0.5) * amount;
         this.camera.position.y += (Math.random() - 0.5) * amount;
+        this.camera.rotateZ((Math.random() - 0.5) * amount * 0.06);
       }
     }
 

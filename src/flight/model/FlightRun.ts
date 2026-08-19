@@ -54,6 +54,27 @@ function biasedSpread(sample: number): number {
 }
 
 /** Dry mass, and the mass the boosters add while they are still attached. */
+/**
+ * How long the opening camera move onto the pad takes.
+ *
+ * A framing value only. It used to be a stage of its own that locked ignition
+ * out for ten seconds, which meant a run opened on a slow drift over open
+ * country rather than on a rocket standing on a launch pad.
+ */
+const PRELAUNCH_SECONDS = 3.5;
+
+/**
+ * Throttle command applied when the player is holding nothing.
+ *
+ * TWR crosses 1.0 at about 52% throttle, so at this rate an untouched launch
+ * lifts off after a few seconds of spool. Holding W gets there in well under
+ * one, which is the intended way to fly it.
+ */
+const IDLE_SPOOL = 0.28;
+
+/** Altitude that counts as a completed ascent, for the visual climb curve. */
+const FULL_ASCENT_ALTITUDE = 2600;
+
 const CORE_MASS = 1;
 const BOOSTER_MASS = 1.4;
 
@@ -134,13 +155,22 @@ export class FlightRun {
    * Staging sheds the booster mass, which makes the vehicle leap.
    */
   private stepLaunch(dt: number, input: FlightInput): void {
+    // The camera eases onto the pad over the opening beat. It runs alongside
+    // whatever the player is doing rather than in front of it: Space works on
+    // the first frame, and pressing it mid-move simply ignites under a camera
+    // that is still settling.
+    this.prelaunch = Math.min(1, this.prelaunch + dt / PRELAUNCH_SECONDS);
+
     if (this.stage === 'pad') {
       if (input.ignitePressed) this.stage = 'ignition';
       return;
     }
 
-    // Throttle is held, not toggled, so leaving the pad is an act.
-    const command = input.throttleDown ? -0.55 : input.throttleUp ? 1 : this.stage === 'ignition' ? 0 : 0.2;
+    // The engines spool up on their own after ignition, so pressing the launch
+    // key always eventually leaves the pad. Holding W is several times faster
+    // and remains the right way to fly it — but pressing Space and watching
+    // nothing happen can no longer occur.
+    const command = input.throttleDown ? -0.55 : input.throttleUp ? 1 : IDLE_SPOOL;
     this.throttle = Math.max(0, Math.min(1, this.throttle + command * dt * 0.75));
 
     const hasBoosters = this.stage === 'ignition' || this.stage === 'boost';
@@ -159,7 +189,11 @@ export class FlightRun {
     }
 
     if (this.stage === 'boost') {
-      this.altitude += Math.max(0, this.twr - 1) * dt * 240;
+      // Deliberately sluggish for the first stretch so the complex stays in
+      // frame and shrinks beneath you, easing up only once it is well clear
+      // of the tower.
+      const climbRate = 34 + Math.min(1, this.altitude / 700) * 230;
+      this.altitude += Math.max(0, this.twr - 1) * dt * climbRate;
       // Staging is the player's call, but a burnt-out booster is dead weight.
       if (input.stagePressed && this.altitude > 120) {
         this.stage = 'staged';
@@ -198,20 +232,36 @@ export class FlightRun {
     if (this.done) return;
 
     const c = this.config;
-    this.elapsed += dt;
 
     // --- launch sequence --------------------------------------------------
     // Only the ascent runs this. Everything else is already flying.
     if (this.stage !== 'flying') {
       this.stepLaunch(dt, input);
     }
+
+    // The corridor clock starts at ignition, not when the sequence loads. It
+    // used to run through the pre-launch hold, so a player who took a moment
+    // on the pad — which the sequence explicitly invites, since it waits for a
+    // keypress — burned the entire ascent standing still and then scored as
+    // having completed it.
+    if (this.stage !== 'pad') this.elapsed += dt;
     const cinematic = this.stage === 'pad' || this.stage === 'ignition';
     this.cinematic = cinematic;
+    // Zero until the engines are actually lit. Reporting a full liftoff while
+    // the stack was still clamped down brought the engine roar up to power
+    // before anyone had told it to go.
     this.liftoff = this.stage === 'pad' ? 0 : this.stage === 'ignition' ? this.throttle : 1;
 
     if (cinematic) {
       // No lateral control until the vehicle is off the pad.
       input = { ...input, x: 0, y: 0 };
+    }
+
+    // Once the launch stages are done the vehicle is simply climbing, so
+    // altitude keeps growing from speed. Keeping one monotonic measure is what
+    // lets every visual key off how high it actually is rather than a clock.
+    if (this.stage === 'flying' && c.id === 'launch') {
+      this.altitude += this.currentSpeed * dt * 1.6;
     }
 
     // --- speed -----------------------------------------------------------
@@ -281,6 +331,7 @@ export class FlightRun {
       for (const body of this.bodies) body.active = false;
     } else if (!this.fieldSeeded) {
       this.fieldSeeded = true;
+      this.hazardWarnUntil = this.elapsed + 4.5;
       this.bodies.forEach((body, index) => {
         this.respawn(body, -c.spawnDepth * (0.25 + (0.75 * index) / this.bodies.length));
       });
@@ -310,6 +361,8 @@ export class FlightRun {
   // authority proportional to thrust, and a staging event that sheds mass.
   private stage: LaunchStage = 'flying';
   private throttle = 0;
+  private prelaunch = 0;
+  private hazardWarnUntil = -1;
   private altitude = 0;
   /** Propellant fraction remaining in the boosters. */
   private boosterFuel = 1;
@@ -408,6 +461,9 @@ export class FlightRun {
       twr: this.twr,
       altitude: this.altitude,
       health: this.health,
+      climb: Math.min(1, this.altitude / FULL_ASCENT_ALTITUDE),
+      prelaunch: this.prelaunch,
+      hazardWarning: this.elapsed < this.hazardWarnUntil,
       finished: this.done,
     };
   }
