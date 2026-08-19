@@ -1,10 +1,4 @@
-/**
- * A soft radial glow, drawn once into a canvas and shared.
- *
- * Used anywhere something needs to look lit — drive plumes, launch exhaust —
- * without paying for a real light or a bloom pass. Sprites keep it facing the
- * camera, so one texture covers every angle.
- */
+/** A soft radial glow, drawn once and shared. Used on camera-facing sprites. */
 
 import * as THREE from 'three';
 

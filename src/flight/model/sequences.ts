@@ -13,6 +13,7 @@ export const SEQUENCES: Record<FlightSequenceId, FlightConfig> = {
   launch: {
     id: 'launch',
     title: 'Ascent',
+    place: 'Earth',
     brief:
       'Ignite, throttle up, fly it off the pad. Stage the boosters when they burn out.',
     sceneKey: 'launch-ascent',
@@ -78,6 +79,7 @@ export const SEQUENCES: Record<FlightSequenceId, FlightConfig> = {
   'mars-descent': {
     id: 'mars-descent',
     title: 'Ares Basin Descent',
+    place: 'Mars',
     brief: 'Through the canyon and onto the pad.',
     sceneKey: 'mars-descent',
     family: 'mars-surface',

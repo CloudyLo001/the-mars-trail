@@ -21,7 +21,7 @@ import { FlightHud } from '../ui/FlightHud';
 import { Hud } from '../ui/Hud';
 import { Screens } from '../ui/Screens';
 import { loadSettings, saveSettings, type DisplaySettings } from '../ui/settings';
-import { MarsTrailSim, autoplay, effectiveSeverity, flightSequenceFor, formatDistance } from '../sim';
+import { LEGS, MarsTrailSim, autoplay, effectiveSeverity, flightSequenceFor, formatDistance } from '../sim';
 import type { AutoplayStyle, BurnRate, GameState, HazardOptionId, Phase, RationLevel } from '../sim';
 import { createSeededRandom } from '../utils/random';
 
@@ -137,9 +137,8 @@ export class Game {
         }
         this.audio.play('ui-confirm');
         this.audio.startAmbience();
-        // Start flying immediately. Blocking departure on the asset stream left
-        // the player staring at the outfitting screen for as long as ten
-        // seconds with no feedback; the pad simply builds itself a beat later.
+        // Normally already cached from the title screen; this only does work
+        // if the player outfitted faster than 8 MB downloads.
         this.startLaunch();
         void this.assets.ensureFamilies(['desert', 'asteroid']).then(() => {
           if (this.flight?.sequence === 'launch') {
@@ -298,6 +297,11 @@ export class Game {
 
     const report = await this.assets.loadEssential();
 
+    // Stream the ascent's families now. The player spends a minute on the
+    // title and the outfitting screen, which is long enough to cover 8 MB, so
+    // departure finds them already cached.
+    void this.assets.ensureFamilies(['desert', 'asteroid']);
+
     if (this.assets.error) {
       this.bootStatus.classList.add('is-error');
       this.bootStatus.textContent = `Asset load failed — ${this.assets.error}`;
@@ -426,10 +430,7 @@ export class Game {
 
     this.pipeline.setSceneAndCamera(this.flight.scene.scene, this.flight.scene.chase.camera);
     if (sequence === 'launch') {
-      // Daylight over a pale desert complex is the brightest thing in the game,
-      // and at the shared threshold every lit roof and concrete apron picked up
-      // a halo. Lifting the threshold keeps the bloom for what is actually hot
-      // — the engine plume — and takes it off everything that is merely white.
+      // Keeps bloom for the plume, off every lit roof and concrete apron.
       this.pipeline.setBloomThreshold(0.94);
       this.pipeline.setBloomStrength(0.2);
     }
@@ -439,15 +440,13 @@ export class Game {
     this.screens.hide();
     this.hud.setVisible(false);
     this.flightHud.setTitle(config.title);
+    this.flightHud.setPlace(config.place ?? null);
     this.flightHud.setVisible(true);
 
     if (sequence === 'launch') {
       // The ascent is the one moment the game is loud. The drive ambience is
       // silenced under it so the two engine beds do not fight.
-      //
-      // The roar itself waits for ignition rather than starting with the
-      // sequence: engines at full power while the stack is still clamped to
-      // the pad is the audio version of the rocket already being in the sky.
+      // The roar waits for ignition rather than starting with the sequence.
       this.audio.setBurnIntensity(0);
       this.roarLit = false;
     } else {
@@ -512,6 +511,10 @@ export class Game {
       // A fast leg change can land while this is in flight; only the newest
       // request is allowed to repopulate.
       if (token === this.legSyncToken) populate();
+      // Then get the next leg's scenery in behind it, so arriving at it does
+      // not pop.
+      const next = LEGS[this.sim.get().legIndex + 1];
+      if (next) void this.assets.ensureFamilies(this.assets.familiesForScene(next.sceneKey));
     });
   }
 
@@ -710,8 +713,7 @@ export class Game {
         const view = this.flight.view;
         this.flightHud.update(view);
         if (this.flight.sequence === 'launch') {
-          // Silence on the pad; the ignition one-shot and the roar loop both
-          // fire on the same frame the engines catch.
+          // One-shot and loop both fire the frame the engines catch.
           if (!this.roarLit && view.stage !== 'pad') {
             this.roarLit = true;
             this.audio.startLaunchRoar();
@@ -822,9 +824,7 @@ export class Game {
         this.flightSeedOverride = seed;
         this.beginFlight(sequence as FlightSequenceId, () => this.renderPhase(true));
         this.flightSeedOverride = null;
-        // Stream the same families departing normally would, or a sequence
-        // started from a test would fly over bare ground and a screenshot of
-        // it would not be a screenshot of the game.
+        // Same families departing loads, or tests fly over bare ground.
         void this.assets.ensureFamilies(['desert', 'asteroid']).then(() => {
           if (this.flight?.sequence === 'launch') {
             this.flight.setPadProps(this.assets.desert);

@@ -289,7 +289,7 @@ export class Screens {
     const blurb = document.createElement('p');
     blurb.className = 'title-blurb';
     blurb.textContent =
-      'Two hundred and twenty-five million kilometres to the Ares Basin colony, and a transfer window that closes in three hundred and forty days. Five people are counting on you to ration the food, spare the drive cores, and choose which hazards are worth the risk. Most captains do not arrive with everyone.';
+      '225 million kilometres to Ares Basin. The transfer window closes in 340 days. Ration the food, spare the drive cores, pick your risks. Most captains do not arrive with everyone.';
     card.appendChild(blurb);
 
     const row = this.choices(card);
@@ -321,17 +321,17 @@ export class Screens {
       [
         '1',
         'Outfit once, at the yard',
-        'Buy drive cores, rations, water, propellant, rad suits, and spares with your whole budget. Prices only go up from here, and you cannot land without a heat shield.',
+        'Spend the whole budget here. Prices only climb, and you cannot land without a heat shield.',
       ],
       [
         '2',
         'Set the burn and the rations',
-        'These two dials run the whole crossing. A harder burn covers more ground and wears the drive and the crew; fuller rations keep everyone healthy and empty the hold sooner.',
+        'A harder burn covers more ground and wears the drive and crew. Fuller rations hold health and empty the hold sooner.',
       ],
       [
         '3',
         'Camp and service the drive',
-        'Camp to run Drive maintenance, wash, rest, or patch the hull. Servicing worn cores is the habit that decides most runs — neglect it and you end up adrift with a healthy crew and a dead engine.',
+        'Camp to service the cores, wash, rest, or patch the hull. Skip the maintenance and you go adrift with a healthy crew and a dead engine.',
       ],
     ];
 
@@ -360,7 +360,7 @@ export class Screens {
     const footnote = document.createElement('p');
     footnote.className = 'howto-footnote';
     footnote.textContent =
-      'Reach Ares Basin with at least one crew member alive. You lose if everyone dies, the transfer window closes, or the last drive core burns out.';
+      'Reach Ares Basin with someone alive. You lose if all die, the window closes, or the last core burns out.';
     section.appendChild(footnote);
 
     card.appendChild(section);
@@ -375,17 +375,17 @@ export class Screens {
     this.title(card, 'How to play');
     this.body(
       card,
-      'Three things run out on this crossing: food, crew condition, and time. Nothing you do improves all three at once — every choice trades one for another. That is the whole design.',
+      'Food, crew condition, and time. Nothing improves all three at once — every choice trades one for another.',
     );
 
     this.tutorialSection(card, 'The two dials', [
       [
         'Burn rate',
-        'Coasting, Standard, or Hard. A harder burn covers more kilometres a day, wears the drive cores faster, and exhausts the crew. Coasting is gentle on everything except the calendar.',
+        'Harder burns cover more ground but wear the cores and exhaust the crew. Coasting is gentle on everything except the calendar.',
       ],
       [
         'Rations',
-        'Filling, Meager, or Bare Bones. Fuller rations hold health, energy, and morale up. Thinner rations stretch the hold but bleed the crew down day after day, and invite hydroponics blight.',
+        'Fuller rations hold health, energy, and morale. Thinner ones stretch the hold, bleed the crew, and invite blight.',
       ],
     ]);
 
@@ -396,22 +396,22 @@ export class Screens {
       ['Morale', 'Isolation, filth, hunger, and every death drag it down. The Deep Quiet is worst.'],
       [
         'Dose',
-        'The one bar where a full bar is bad. Radiation accumulates and never falls on its own — only a station infirmary flushes it. Rad suits blunt it; nothing stops it.',
+        'The one bar where full is bad. Only an infirmary flushes it. Rad suits blunt it; nothing stops it.',
       ],
     ]);
 
     this.tutorialSection(card, 'Drive cores are your team', [
       [
-        'They pull the ship',
-        'Cores string out ahead of the hull in harness. Drive load is shared across every core installed, so six cores wear each one far slower than two do.',
+        'They drive the ship',
+        'Cores ride a ring around the hull. Load is shared across every core installed, so six wear far slower than two.',
       ],
       [
         'They fail one at a time',
-        'A burned-out core visibly leaves the line. A spare coolant pump can sometimes save one. Below two cores the ship is adrift, and the run is over.',
+        'A burned-out core leaves the ring and the rest close up. A spare coolant pump can sometimes save one. Below two you are adrift and the run is over.',
       ],
       [
         'Service them or lose the run',
-        'Camp for Drive maintenance whenever a core is worn, and refit at any station you can afford. This is the single most important habit in the game: captains who never service the cores go adrift roughly three runs in four, while the same ship serviced regularly almost always arrives.',
+        'Camp for maintenance whenever a core is worn, and refit at any station you can afford. Captains who never service go adrift three runs in four.',
       ],
     ]);
 
@@ -425,26 +425,26 @@ export class Screens {
     this.tutorialSection(card, 'Places to stop', [
       [
         'Stations',
-        'Resupply, hull repair, drive refit, infirmary, and shore leave. Markup climbs the further you get from Earth, so the cheap fix is always the one you already passed.',
+        'Resupply, repair, refit, infirmary, shore leave. Markup climbs with distance, so the cheap fix is always the one you passed.',
       ],
       [
         'Camp',
-        'Available any travel day. Wash, rest, patch the hull with plates, tend the hydroponics, or service the cores. Costs days, never credits.',
+        'Any travel day. Wash, rest, patch the hull, tend hydroponics, service the cores. Costs days, never credits.',
       ],
       [
         'Harvest fields',
-        `An EVA minigame at ice and salvage waypoints. Stop the needle in the band. The tether rig carries ${HARVEST_CARRY_CAP} kg at most no matter how well you shoot, and the EVA costs ${HARVEST_CELL_COST} propellant cells and a day.`,
+        `Stop the needle in the band at ice and salvage waypoints. The tether carries ${HARVEST_CARRY_CAP} kg at most; each EVA costs ${HARVEST_CELL_COST} cells and a day.`,
       ],
     ]);
 
     this.tutorialSection(card, 'Scoring', [
       [
         'Crew is worth the most',
-        'Survivors score far above cargo, weighted by the health they arrive in.',
+        'Survivors outscore cargo, weighted by arrival health.',
       ],
       [
         'Poverty pays',
-        'Corporate Financier starts rich at a ×1 multiplier. Terraform Homesteader starts with almost nothing at ×3. The harder crossing is worth three times as much.',
+        'Corporate Financier starts rich at ×1. Terraform Homesteader starts with nothing at ×3.',
       ],
     ]);
 
@@ -484,7 +484,7 @@ export class Screens {
     this.title(card, 'Who are you');
     this.body(
       card,
-      'Your trade sets your budget and your final score. The poorer you start, the more the crossing is worth.',
+      'Your trade sets your budget and your score. The poorer you start, the more the crossing is worth.',
     );
 
     const list = document.createElement('div');
@@ -552,7 +552,7 @@ export class Screens {
     this.title(card, "Yard Requisition");
     this.body(
       card,
-      'Everything you will have for the next eight months, bought once, at the only honest prices on the trail. Two drive cores will move the ship; four to six will get it to Mars.',
+      'Everything you get for eight months, at the only honest prices on the trail. Two cores move the ship; four to six reach Mars.',
     );
 
     this.renderStore(card, sim, state, false);

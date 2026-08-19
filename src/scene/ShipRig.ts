@@ -1,42 +1,22 @@
 /**
- * The player's ship and its team of drive cores.
+ * The player's ship and its drive cores.
  *
- * The cores ride in a ring around the hull's long axis rather than strung out
- * ahead of it. The tow-line reading was the wagon-and-oxen composition of the
- * reference, but once the towed object became an obviously self-propelled
- * rocket, engines out in front stopped reading as a team in harness and
- * started reading as a mistake.
- *
- * The ring turns, so cores cross in front of the hull and then pass behind it.
- * That is the whole reason for choosing the fuselage axis over a camera-facing
- * ring: the occlusion is what makes a side-on scene look like it has depth.
+ * Cores ride a turning ring around the hull's long axis, so they cross in
+ * front of it and then pass behind. That occlusion gives a side-on scene depth.
  */
 
 import * as THREE from 'three';
 import { createGlowTexture } from './glow';
 
-/**
- * Ring radius as a multiple of the hull's length.
- *
- * Anchored to the length, not the cross-section: three times the width put the
- * cores so far out that they crossed the parallax mountains and read as
- * unrelated traffic rather than as the ship's own team. At this factor the
- * ring's diameter is a little over the hull's length, which keeps the rocket
- * visibly inside it while holding the whole group in one frame.
- */
+/** Ring radius as a multiple of hull length. Diameter slightly exceeds it. */
 const RING_RADIUS_FACTOR = 0.6;
 
 /** Fallback ring radius, used until a hull has been measured. */
 const DEFAULT_RING_RADIUS = 2.4;
 
 /**
- * Tilt of the ring away from square-on to the fuselage, in radians.
- *
- * A ring perfectly perpendicular to the hull is seen exactly edge-on from this
- * camera, and projects to a vertical line: the cores look like they are bobbing
- * up and down rather than going round. Opening it by this much projects a
- * legible ellipse — enough to read as an orbit, little enough that it is still
- * plainly a ring around the ship rather than a disc beside it.
+ * Tilt off square-on, in radians. Perpendicular is seen exactly edge-on from
+ * this camera and projects to a line, which reads as bobbing, not orbiting.
  */
 const RING_TILT = 0.4;
 
@@ -44,20 +24,10 @@ const RING_TILT = 0.4;
 const SPIN_COASTING = 0.32;
 const SPIN_HARD = 1.05;
 
-/**
- * How fast a core slides to its new slot after one of its neighbours dies.
- *
- * Exponential in delta, so the ease takes the same wall-clock time at any
- * frame rate. Roughly a second to close up.
- */
+/** Re-slot ease rate. Exponential in delta; roughly a second to close up. */
 const RESPACE_RATE = 4;
 
-/**
- * Where the hull sits in world space, and therefore the centre of the ring.
- *
- * Right of the camera's look-at point, so the ship reads as heading out of
- * frame rather than parked in the middle of it.
- */
+/** Hull position, and so the ring centre. Right of the camera's look-at. */
 const HULL_POSITION = new THREE.Vector3(5.4, -3.1, 0);
 
 export class ShipRig {
@@ -69,11 +39,8 @@ export class ShipRig {
 
   private hullModel: THREE.Object3D | null = null;
   private coreModel: THREE.Object3D | null = null;
-  /**
-   * One entry per visible core. `offset` is where it currently sits around the
-   * ring; `target` is the evenly-spaced slot it belongs in. They differ only
-   * while the survivors of a failure are closing up.
-   */
+  /** `offset` is where a core is, `target` its even slot. They differ only
+   * while survivors of a failure close up. */
   private coreInstances: Array<{ object: THREE.Object3D; offset: number; target: number }> = [];
 
   /** Ring rotation, in radians. Advances every frame. */
@@ -113,8 +80,7 @@ export class ShipRig {
     model.rotation.set(0, 0, Math.PI / 2);
     this.hullModel = model;
     this.hullHost.add(model);
-    // Size the ring off the hull actually installed rather than a tuned number.
-    // Laid on its side the long axis is x.
+    // Sized off the hull actually installed. Laid on its side, long axis is x.
     model.updateMatrixWorld(true);
     const size = new THREE.Box3().setFromObject(model).getSize(new THREE.Vector3());
     const length = Math.max(size.x, size.y, size.z);
@@ -136,13 +102,8 @@ export class ShipRig {
   }
 
   /**
-   * Match the number of visible cores to game state.
-   *
-   * Survivors are kept in place rather than rebuilt: a core burning out has to
-   * look like the ring closing up, and destroying every instance and laying
-   * them out afresh would teleport the whole team a fraction of a turn. Only
-   * the difference is added or removed, and the remaining cores are given new
-   * slots to ease into.
+   * Match visible cores to game state. Only the difference is added or
+   * removed; rebuilding would teleport the survivors mid-rotation.
    */
   setCoreCount(count: number): void {
     const clamped = Math.max(0, Math.min(10, Math.round(count)));
@@ -167,12 +128,10 @@ export class ShipRig {
 
     while (this.coreInstances.length < clamped) {
       const object = this.coreModel.clone(true);
-      // Nozzles aft: every core stays parallel to the hull wherever it is in
-      // the ring, so the team reads as thrusters and not as a carousel.
+      // Nozzles aft wherever it sits, so the team reads as thrusters.
       object.rotation.y = Math.PI * 0.5;
       this.coreHost.add(object);
-      // A core bought or rebuilt mid-flight appears already in its slot; there
-      // is nothing for it to slide in from.
+      // A new core appears already in its slot; nothing to slide in from.
       const slot = (this.coreInstances.length / clamped) * Math.PI * 2;
       this.coreInstances.push({ object, offset: slot, target: slot });
     }
@@ -220,25 +179,19 @@ export class ShipRig {
     this.hullHost.position.y = HULL_POSITION.y + bob;
     this.hullHost.rotation.z = Math.sin(this.bobTime * 0.6) * 0.012;
 
-    // --- the ring --------------------------------------------------------
-    // Spin tracks the burn, so choosing a harder schedule is something you can
-    // see in the scene rather than only in the log.
+    // Spin tracks the burn, so the schedule is visible in the scene.
     const spin = SPIN_COASTING + (SPIN_HARD - SPIN_COASTING) * Math.max(0, Math.min(1, burnFactor));
     this.ringPhase = (this.ringPhase + spin * delta) % (Math.PI * 2);
 
     const ease = 1 - Math.exp(-RESPACE_RATE * delta);
     for (const entry of this.coreInstances) {
-      // Close the gap the short way round, or a core re-slotting from 350° to
-      // 10° would travel most of a lap backwards to get one step forwards.
+      // The short way round, or 350 degrees to 10 travels most of a lap back.
       let gap = entry.target - entry.offset;
       gap -= Math.PI * 2 * Math.round(gap / (Math.PI * 2));
       entry.offset += gap * ease;
 
       const angle = this.ringPhase + entry.offset;
-      // The ring lies across the fuselage, rotated by RING_TILT about the
-      // vertical so the circle opens toward the camera. Ride the hull's bob
-      // too, so the ring stays locked to the ship rather than drifting
-      // against it.
+      // Rides the hull's bob so the ring stays locked to the ship.
       const across = Math.cos(angle) * this.ringRadius;
       entry.object.position.set(
         HULL_POSITION.x + across * Math.sin(RING_TILT),

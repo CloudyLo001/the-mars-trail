@@ -120,13 +120,7 @@ export class PixelPipeline {
     this.bloomPass.strength = value;
   }
 
-  /**
-   * Luminance a pixel has to reach before it blooms.
-   *
-   * Raise it to stop lit-but-not-emissive surfaces — a white building in
-   * daylight — from wearing a halo, while leaving genuinely hot things like an
-   * engine plume glowing.
-   */
+  /** Raise to stop merely-white surfaces haloing while hot ones still glow. */
   setBloomThreshold(value: number): void {
     this.bloomPass.threshold = THREE.MathUtils.clamp(value, 0, 1);
   }

@@ -8,6 +8,9 @@
 
 import type { FlightRunView } from '../flight/model/types';
 
+/** Climb fraction past which the ascent has left Earth behind. */
+const LEFT_EARTH_AT = 0.42;
+
 export class FlightHud {
   private readonly root = this.element('#flight-hud');
   private readonly title = this.element('#flight-title');
@@ -18,9 +21,11 @@ export class FlightHud {
   private readonly health = this.element('#flight-health');
   private readonly prompt = this.element('#flight-prompt');
   private readonly sign = this.element('#flight-sign');
+  private readonly place = this.element('#flight-place');
   private readonly hint = this.element('#flight-hint');
 
   private lastHits = -1;
+  private placeName: string | null = null;
 
   setVisible(visible: boolean): void {
     this.root.hidden = !visible;
@@ -29,6 +34,12 @@ export class FlightHud {
   setTitle(text: string): void {
     this.title.textContent = text;
     this.lastHits = -1;
+  }
+
+  /** Null in open space, where there is no place to name. */
+  setPlace(text: string | null): void {
+    this.placeName = text;
+    if (text) this.place.textContent = text;
   }
 
   update(view: FlightRunView): void {
@@ -47,6 +58,9 @@ export class FlightHud {
     // Called out the moment the field arrives, because the transition from an
     // empty sky to a corridor full of rock is otherwise unannounced.
     this.sign.hidden = !view.hazardWarning;
+
+    // Hidden in open space, and on the ascent once Earth is behind you.
+    this.place.hidden = this.placeName === null || view.climb >= LEFT_EARTH_AT;
 
     // Hull health, as a bar rather than a number to infer from impacts.
     this.health.style.width = `${Math.max(0, view.health)}%`;

@@ -89,13 +89,7 @@ export class ChaseCamera {
     this.shake = Math.min(1.2, this.shake + strength);
   }
 
-  /**
-   * Sustained vibration, 0-1, held for as long as it is set.
-   *
-   * Distinct from `impulse`, which is a single decaying kick. Engines running
-   * are a continuous event, so they need a continuous shake — a string of
-   * impulses would pulse at whatever rate they were fired.
-   */
+  /** Sustained vibration, 0-1. Unlike `impulse`, it holds until changed. */
   setRumble(amount: number): void {
     this.rumble = Math.max(0, Math.min(1, amount));
   }
@@ -121,15 +115,9 @@ export class ChaseCamera {
     if (this.launchMode) {
       const w = this.launchFraming;
 
-      // Pad shot stands off to one side, a little above the deck, looking back
-      // at the vehicle. The flying shot sits on top of it near the nose, so the
-      // tip is in shot and the body is not in the way.
-      //
-      // `pass` opens the pad shot out for the first few seconds and then closes
-      // it in. It stays close enough throughout that the rocket reads as
-      // standing on a launch pad rather than as a speck over open country, and
-      // high enough that the ground plane is not edge-on — level with it the
-      // plane vanishes, and below it the plane is backface-culled away.
+      // Pad shot: beside and just above the deck. Flying shot: on the nose.
+      // `pass` opens the pad shot out at the start, then closes in. Kept above
+      // the ground plane, which vanishes edge-on and is culled from below.
       const pass = 1 - this.prelaunch;
       this.target.set(
         view.shipX + w * (9 + pass * 13),
@@ -145,8 +133,7 @@ export class ChaseCamera {
       // the corridor fills the rest; angled up at the vehicle on the pad.
       this.lookTarget.set(
         view.shipX * (1 - w * 0.4) + view.shipVX * 0.25 * (1 - w),
-        // Aimed at the vehicle rather than well above it, so the pad and the
-        // gantry it is standing on stay in the bottom of the frame.
+        // At the vehicle, so the pad stays in the bottom of the frame.
         view.shipY + (1 - w) * FLYING_LIFT + w * 0.6,
         w * -2 + (1 - w) * -LOOK_AHEAD,
       );
@@ -173,8 +160,7 @@ export class ChaseCamera {
       if (this.shake > 0.001) {
         this.shake *= Math.exp(-5 * delta);
       }
-      // One jitter for both sources, so a hit during the burn does not read as
-      // two shakes fighting each other.
+      // One jitter for both, or a hit during the burn reads as two shakes.
       const amount = this.shake * 0.35 + this.rumble * 0.09;
       if (amount > 0.001) {
         this.camera.position.x += (Math.random() - 0.5) * amount;

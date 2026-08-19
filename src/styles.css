@@ -1297,6 +1297,16 @@ button:disabled {
   justify-items: center;
 }
 
+/* Where you are, above what you are doing. Dimmer than the title so it reads
+   as a location label and not a second heading. */
+.flight-place {
+  color: var(--amber);
+  font-size: 10px;
+  letter-spacing: 0.4em;
+  opacity: 0.72;
+  text-transform: uppercase;
+}
+
 .flight-title {
   color: var(--green);
   font-size: 13px;

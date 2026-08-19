@@ -61,6 +61,8 @@ export interface FlightConfig {
   title: string;
   /** Shown on the pre-flight card. */
   brief: string;
+  /** Where this happens. Shown above the title; omitted in open space. */
+  place?: string;
   /** Scene palette key, reused from src/scene/palettes.ts. */
   sceneKey: string;
   /** Which loaded prop family the obstacles are drawn from. */
@@ -133,18 +135,11 @@ export interface FlightRunView {
   twr: number;
   /** Metres climbed. Monotonic across the whole ascent. */
   altitude: number;
-  /**
-   * 0-1 of the full ascent, derived from altitude rather than elapsed time.
-   * Every launch visual keys off this so nothing moves until the rocket does.
-   */
+  /** 0-1 of the ascent, from altitude. Launch visuals key off this, not time. */
   climb: number;
   /** 0-100 hull health. Reaching zero ends the ascent. */
   health: number;
-  /**
-   * 0-1 through the opening camera move onto the pad. Purely a framing value:
-   * the vehicle is on the pad and ignitable from the first frame, so this
-   * never gates anything the player can do.
-   */
+  /** 0-1 through the opening camera move. Framing only; gates nothing. */
   prelaunch: number;
   /** True for a few seconds once the obstacle field arrives. */
   hazardWarning: boolean;

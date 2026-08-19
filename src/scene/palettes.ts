@@ -160,10 +160,8 @@ export const PALETTES: Record<string, ScenePalette> = {
 
   'launch-ascent': {
     key: 'launch-ascent',
-    // Dawn over a dry lakebed, darkening to black as the ship climbs. The sun
-    // sits low and warm so the complex casts long raking shadows across the
-    // pan; the fill is cold, which is what makes the light read as sunrise
-    // rather than as an overcast noon.
+    // Dawn over a dry lakebed. Warm low sun, cold fill: that contrast is what
+    // makes it read as sunrise rather than overcast noon.
     skyTop: '#20305e',
     skyMid: '#7a6a8e',
     skyBottom: '#d8a071',
@@ -178,9 +176,7 @@ export const PALETTES: Record<string, ScenePalette> = {
     hemiSky: '#8ea6c8',
     hemiGround: '#6a4a30',
     hemiIntensity: 1.4,
-    // Low and to the side. Low enough for long raking shadows, high enough
-    // that a flat pan still catches light — at a true grazing angle the lakebed
-    // went black and the whole site read as night.
+    // Low enough for raking shadows, high enough that a flat pan still lights.
     sunPosition: [18, 6.5, 9],
     starDensity: 0,
     particleColor: '#f0d2b0',

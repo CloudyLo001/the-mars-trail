@@ -17,44 +17,20 @@ import { paletteFor, type ScenePalette } from '../scene/palettes';
 import { createGlowTexture } from '../scene/glow';
 import type { FlightConfig, FlightRunView } from './model/types';
 
-/**
- * Distance the ground plane spans on launch and descent.
- *
- * Wider than the camera's far plane on purpose. At 900 the plane's own edge
- * came into shot as soon as the vehicle had climbed a hundred units, and the
- * earth ended in a visible triangle; now the far plane clips it long before
- * the geometry runs out, and the haze carries it into the sky.
- */
+/** Ground plane span. Wider than the camera far plane so its edge never shows. */
 const GROUND_SIZE = 2600;
 
 /** Star count. Fewer than the travel backdrop; the eye is busy here. */
 const STAR_COUNT = 600;
 
-/**
- * Altitude, in the model's units, over which the camera swings from the pad
- * shot to the flying shot and the vehicle pitches into its gravity turn.
- *
- * Keyed to altitude and not to a clock: timing the handover from the start of
- * the sequence swung the camera away and sank the launch complex while the
- * rocket was still clamped down waiting for ignition, so it read as already
- * flying before the player had pressed anything. Nothing moves until it does.
- */
+/** Altitude band over which the camera swings from pad shot to flying shot. */
 const HANDOVER_START = 120;
 const HANDOVER_END = 900;
 
-/**
- * How far the world sinks per unit of altitude climbed.
- *
- * The vehicle stays at the origin and the world flows past it, so this is the
- * climb: the pad and the ground fall away by exactly what the rocket gains.
- */
+/** World units the ground sinks per unit of altitude. The ship never moves. */
 const GROUND_DROP = 0.5;
 
-/**
- * Altitude past which the ground and the complex are gone for good. Comfortably
- * beyond the handover, so the earth never blinks out while the pad shot is
- * still partly on screen.
- */
+/** Altitude past which ground and complex are hidden. Beyond the handover. */
 const GROUND_HIDE_ALTITUDE = 1100;
 
 /** Resting height of the ground plane, level with the base of the pad. */
@@ -73,10 +49,8 @@ const WHITE = new THREE.Color('#ffffff');
  * so climbing reads as passing through distinct layers of atmosphere. A smooth
  * gradient would blend them into mush and lose that.
  */
+// Dawn: amber at the pan, cooling to violet, deep blue, then vacuum.
 const ASCENT_SKY: Array<{ upTo: number; color: string; ground: string }> = [
-  // Dawn: amber at the pan, cooling through dusty violet into deep blue and
-  // then vacuum. The ground darkens alongside it, because at altitude the
-  // lakebed is a shadow you are leaving rather than a surface you are lit by.
   { upTo: 0.1, color: '#d8955f', ground: '#9c6a41' },
   { upTo: 0.22, color: '#b57f6b', ground: '#845738' },
   { upTo: 0.36, color: '#7d6b8c', ground: '#6f4f33' },
@@ -104,27 +78,14 @@ export class FlightScene {
   private readonly shipHost = new THREE.Group();
   private shipModel: THREE.Object3D | null = null;
 
-  /**
-   * Engine exhaust for the ascent.
-   *
-   * Two additive sprites — a hot core and a wider wash — parented to the ship
-   * so they follow it. They are dark until ignition, which is what makes
-   * pressing the key read as lighting the engines rather than as the scenery
-   * quietly starting to move.
-   */
+  /** Ascent exhaust: hot core plus wider wash, dark until ignition. */
   private readonly plumeHost = new THREE.Group();
   private readonly plumeCore: THREE.Sprite;
   private readonly plumeWash: THREE.Sprite;
   private readonly plumeCoreMaterial: THREE.SpriteMaterial;
   private readonly plumeWashMaterial: THREE.SpriteMaterial;
 
-  /**
-   * The exhaust as a light source, not just a sprite.
-   *
-   * At dawn the pad is the darkest the site ever is, so the engines lighting
-   * up underlight the pad, the tower and the underside of the hull. That is
-   * what makes ignition register as an event rather than as a decal appearing.
-   */
+  /** The exhaust as a light source, so ignition underlights the whole site. */
   private readonly plumeLight = new THREE.PointLight('#ffa044', 0, 44, 2);
 
   private readonly stars: THREE.Points;
@@ -139,15 +100,8 @@ export class FlightScene {
   /** Ground haze for the ascent. Built lazily; only the launch uses it. */
   private haze: THREE.Fog | null = null;
 
-  /**
-   * Seating the vehicle on the pad.
-   *
-   * The ship never moves — the world moves past it — so the complex has to be
-   * lifted to meet the tail rather than the rocket being lowered onto the
-   * deck. Both numbers are measured off the actual models: the generated pad
-   * is a 1-unit slab and the vehicle is fitted to 4.2 units, and a hard-coded
-   * offset for either left the rocket hanging three units above its own pad.
-   */
+  // The ship never moves, so the complex is lifted to meet its tail. Both
+  // measured off the real models rather than tuned.
   private shipBaseY = -2.1;
   private padDeckY: number | null = null;
   private padRestY = 0;
@@ -241,24 +195,18 @@ export class FlightScene {
   }
 
   /**
-   * Install the vehicle. It is the one object that steers.
-   *
-   * The launch rocket is modelled standing upright, which is correct on the pad
-   * but perpendicular to its own direction of travel once it is flying. It is
-   * therefore pitched over during the handover — a gravity turn — rather than
-   * being fixed at either extreme.
+   * Install the vehicle, the one object that steers. Modelled upright for the
+   * pad, so the launch pitches it over during the handover.
    */
   setShipModel(model: THREE.Object3D): void {
     if (this.shipModel) this.shipHost.remove(this.shipModel);
     this.shipModel = model;
-    // Where the tail sits when the vehicle is standing, measured in its
-    // upright pose. This is what the pad is seated against.
+    // The tail in its upright pose: what the pad is seated against.
     model.rotation.set(0, 0, 0);
     model.updateMatrixWorld(true);
     this.shipBaseY = new THREE.Box3().setFromObject(model).min.y;
     this.seatComplex();
-    // Nose along the corridor by default. The launch overrides this each frame
-    // so the vehicle can stand upright on the pad and pitch over on handover.
+    // Nose along the corridor. The launch overrides this each frame.
     model.rotation.set(-Math.PI / 2, 0, 0);
     this.shipHost.add(model);
   }
@@ -302,17 +250,9 @@ export class FlightScene {
   }
 
   /**
-   * Lay out the launch complex around the vehicle.
-   *
-   * Placement is by index rather than by name so it degrades gracefully: with
-   * no generated props the ascent still runs, just over open desert.
-   *
-   * There are six generated desert pieces and this is a working spaceport, so
-   * every piece is used many times at different scales and rotations. That is
-   * the whole trick: the apron slab is also a hardstand and a secondary pad,
-   * the gantry is also a floodlight mast, and the mesa is a different mesa at
-   * every distance. Repetition reads as a site rather than as a shortage
-   * because nothing shares a silhouette with its neighbour.
+   * Lay out the launch complex. Six generated pieces reused at many scales and
+   * rotations: the apron is also a hardstand, the gantry also a floodlight
+   * mast. Placement is by index, so a missing prop just leaves a gap.
    */
   private buildPad(props: THREE.Object3D[]): void {
     if (props.length === 0) return;
@@ -338,18 +278,16 @@ export class FlightScene {
       // --- the pad itself ------------------------------------------------
       { index: APRON, pos: [0, -5.6, 0], scale: 4.5, seat: true },
       { index: TOWER, pos: [-6.5, -3.4, -1], scale: 5.5 },
-      // Flame trench shoulders: the same apron slab, low and to either side.
+      // Flame trench shoulders.
       { index: SLAB, pos: [0, -6.4, 7], scale: 5, rotY: 0.15 },
       { index: SLAB, pos: [-1, -6.4, -8], scale: 5.5, rotY: -0.2 },
 
       // --- immediate site ------------------------------------------------
-      // Floodlight masts: the gantry again, small enough to read as lighting.
-      // All of it is kept behind the pad in z — the camera watches from in
-      // front, and anything level with it becomes the subject instead.
+      // Floodlight masts. All kept behind the pad in z, or they upstage it.
       { index: TOWER, pos: [11, -5.2, -6], scale: 2.1, rotY: 1.1 },
       { index: TOWER, pos: [-13, -5.2, -3], scale: 1.9, rotY: -0.7 },
       { index: TOWER, pos: [14, -5.2, -20], scale: 2.3, rotY: 2.4 },
-      // Fuel farm and support buildings, clustered off the pad.
+      // Fuel farm and support buildings.
       { index: HANGAR, pos: [24, -5.2, -22], scale: 3.4, rotY: 0.5 },
       { index: HANGAR, pos: [-26, -5.2, -18], scale: 3, rotY: -1.2 },
       { index: APRON, pos: [19, -5.9, -30], scale: 3.2, rotY: 0.8 },
@@ -364,23 +302,17 @@ export class FlightScene {
       { index: TOWER, pos: [-36, -3.6, -31], scale: 5 },
       { index: APRON, pos: [48, -5.8, -56], scale: 8, rotY: -0.6 },
       { index: TOWER, pos: [55, -3.4, -58], scale: 5.5, rotY: 1.4 },
-      // Access road, running out from the site. Only where it reads as poured
-      // concrete: the slab is a ground tile, and scattered across open pan it
-      // just looks like the terrain has patches.
+      // Access road. The slab is a ground tile, so only where it reads as
+      // poured concrete — on open pan it looks like terrain patches.
       { index: SLAB, pos: [12, -6.2, -24], scale: 9, rotY: 0.2 },
 
-      // --- berms ----------------------------------------------------------
-      // The wide flat piece as the lakebed shelf the site sits on. Low enough
-      // to read as ground rather than as a building.
+      // --- berms: the lakebed shelf the site sits on ----------------------
       { index: RIDGE, pos: [-70, -6.2, -70], scale: 26, rotY: 0.1 },
       { index: RIDGE, pos: [96, -6.2, -110], scale: 30, rotY: -0.8 },
 
-      // --- horizon: layered mesas ----------------------------------------
-      // Four ranks, each roughly half again as large and half again as distant
-      // as the one in front. The piece is a wide low ridge, so it only reads as
-      // a mesa at these scales; at anything smaller it is a rock on the pan.
-      // Overlapping the ranks is what gives the haze something to separate, so
-      // the depth is read rather than assumed.
+      // --- horizon: layered mesas -----------------------------------------
+      // The piece is a wide low ridge, so it only reads as a mesa this large.
+      // Ranks overlap, giving the haze something to separate.
       { index: MESA, pos: [-90, -8, -180], scale: 95, rotY: 0.4 },
       { index: MESA, pos: [130, -8, -215], scale: 110, rotY: -0.9 },
       { index: MESA, pos: [-40, -10, -290], scale: 150, rotY: 1.3 },
@@ -390,16 +322,13 @@ export class FlightScene {
     ];
 
     for (const entry of layout) {
-      // No fallback: a missing slot leaves that piece out rather than standing
-      // the wrong model in its place.
       const source = props[entry.index];
       if (!source) continue;
       const object = source.clone(true);
       object.position.set(...entry.pos);
       object.scale.setScalar(entry.scale);
       if (entry.rotY) object.rotation.y = entry.rotY;
-      // Measured before parenting, so the reading is the piece's own extent
-      // and not wherever the complex has since sunk to.
+      // Measured before parenting, so it is the piece's own extent.
       if (entry.seat) {
         object.updateMatrixWorld(true);
         this.padDeckY = new THREE.Box3().setFromObject(object).max.y;
@@ -419,13 +348,8 @@ export class FlightScene {
     this.seatComplex();
   }
 
-  /**
-   * Lift the complex and the ground under it so the deck meets the tail.
-   *
-   * Called from both ends because the pad and the vehicle arrive in either
-   * order: the desert pack streams in behind the sequence starting, and the
-   * hull is installed after the scene is built.
-   */
+  /** Lift the complex so the deck meets the tail. Pad and hull arrive in
+   * either order, so this is called from both. */
   private seatComplex(): void {
     this.padRestY = this.padDeckY === null ? 0 : this.shipBaseY - this.padDeckY;
   }
@@ -453,15 +377,9 @@ export class FlightScene {
     // toward space as altitude builds. This is the whole point of the sequence,
     // so it is driven by progress rather than being a fixed backdrop.
     if (config.id === 'launch') {
-      // Altitude, not elapsed time. Driving any of this from progress meant
-      // the pad and terrain began sinking the moment the sequence started —
-      // through the camera pass, while the vehicle was still clamped down — so
-      // the rocket never convincingly sat on the ground.
+      // Everything here keys off altitude, never elapsed time, or the pad
+      // starts sinking while the vehicle is still clamped down.
       const climbed = view.climb;
-      // The camera swings from the pad shot to the flying shot as the vehicle
-      // climbs clear of the tower, so control arriving is felt as a move
-      // rather than announced by a cut. Smoothstepped, so it eases rather than
-      // starting and stopping abruptly.
       const rise = Math.max(
         0,
         Math.min(1, (view.altitude - HANDOVER_START) / (HANDOVER_END - HANDOVER_START)),
@@ -469,16 +387,13 @@ export class FlightScene {
       const swing = rise * rise * (3 - 2 * rise);
       const padWeight = 1 - swing;
 
-      // Flat opaque bands: the sky steps through solid colours as altitude
-      // builds rather than blending, which is the stylisation asked for and
-      // also makes the climb legible at a glance.
+      // Flat opaque bands rather than a gradient: the climb reads as passing
+      // through distinct layers.
       const band = ascentBand(climbed);
       this.scene.background = new THREE.Color(band.color);
       this.groundMaterial.color.set(band.ground);
 
-      // Haze, so the mesas stack into layers instead of all reading as one
-      // hard silhouette. It thins as the air does and is gone by the time
-      // there is no horizon left to soften.
+      // Haze separates the mesa ranks. Thins with the air.
       if (climbed < HAZE_FADES_BY) {
         const thinning = 1 - climbed / HAZE_FADES_BY;
         if (!this.haze) this.haze = new THREE.Fog(band.color, 0, 1);
@@ -499,12 +414,8 @@ export class FlightScene {
       this.starMaterial.opacity = Math.max(0, (climbed - 0.55) * 2);
       this.stars.visible = climbed > 0.55;
 
-      // Ground and pad exist only for the liftoff. Once the vehicle is well
-      // clear there is deliberately nothing below — no horizon means no cue
-      // that you are flying sideways.
-      // Purely altitude: at rest on the pad the drop is zero and the complex
-      // sits under the vehicle, on the ground, which is the whole point of the
-      // opening shot.
+      // Nothing below once the vehicle is clear: no horizon, no cue that you
+      // are flying sideways.
       const drop = view.altitude * GROUND_DROP;
       const grounded = view.altitude < GROUND_HIDE_ALTITUDE;
       this.ground.position.y = GROUND_Y + this.padRestY - drop;
@@ -512,17 +423,13 @@ export class FlightScene {
       this.padHost.position.y = this.padRestY - drop;
       this.padHost.visible = grounded;
 
-      // Pitch the vehicle from standing on the pad to pointing up its own
-      // line of travel. This is the gravity turn, and it is what stops the
-      // rocket flying sideways through the sky.
+      // The gravity turn: upright on the pad, nose along the corridor in flight.
       if (this.shipModel) {
         this.shipModel.rotation.x = -Math.PI / 2 + padWeight * (Math.PI / 2);
       }
 
-      // Exhaust. Lit from the moment the engines catch, so ignition is a thing
-      // you see and not just a line of HUD text. It sits under the vehicle on
-      // the pad and swings behind it as the stack pitches over, tracking the
-      // same weight the model's own rotation does.
+      // Exhaust, lit the moment the engines catch. Under the vehicle on the
+      // pad, behind it once pitched over.
       const lit =
         view.stage === 'ignition' || view.stage === 'boost' || view.stage === 'staged'
           ? view.throttle
@@ -532,39 +439,27 @@ export class FlightScene {
       this.plumeHost.visible = lit > 0.01;
       if (this.plumeHost.visible) {
         const flicker = 0.88 + Math.sin(view.seconds * 34) * 0.12;
-        // Below the vehicle while it stands upright, behind it once it is
-        // flying its own line — the same blend the hull's pitch uses.
         this.plumeHost.position.set(0, padWeight * -2.6, (1 - padWeight) * 2.6);
-        // Drawn out downward while the stack is vertical and the exhaust is
-        // going into the ground; round once the camera is behind it and
-        // looking straight into the bells.
+        // Drawn out downward when vertical, round once seen from behind.
         const stretch = 1 + padWeight * 0.7;
-        // Eased down as the camera moves onto the nose: the same plume that
-        // reads well from beside the pad swamps the frame from two units away.
+        // Eased down as the camera moves onto the nose, or it swamps the frame.
         const size = (1 + lit * 1.5) * flicker * (0.55 + padWeight * 0.45);
         this.plumeCore.scale.set(size * 0.5, size * 0.5 * stretch, 1);
         this.plumeWash.scale.set(size * 1.15, size * 1.15 * stretch, 1);
         this.plumeCoreMaterial.opacity = Math.min(1, 0.3 + lit * 0.6);
         this.plumeWashMaterial.opacity = Math.min(0.6, 0.15 + lit * 0.4);
-        // Flares hard at ignition and falls away with the air: once there is
-        // nothing under the vehicle to light, the light is just noise.
+        // Pointless once there is nothing below to light.
         const nearGround = Math.max(0, 1 - view.altitude / GROUND_HIDE_ALTITUDE);
         this.plumeLight.intensity = lit * flicker * 620 * nearGround;
       } else {
         this.plumeLight.intensity = 0;
       }
 
-      // The whole stack rattles while the engines are lit and the clamps are
-      // still taking the load, easing off as it climbs away.
+      // Rattles hardest while the clamps still take the load.
       this.chase.setRumble(lit * (0.55 + 0.45 * (1 - Math.min(1, view.altitude / 400))));
 
-      // The cloud deck is the first thing you fly through: thick as you leave
-      // the pad, thinning to nothing by the time the debris arrives. It is
-      // scenery, so it spreads far wider than the corridor and simply washes
-      // over you rather than being something to avoid.
-      // Nothing at ground level: the pad, gantry and desert have to read
-      // cleanly before the deck arrives. It builds once you are climbing and
-      // thins out again above the weather.
+      // Cloud deck: nothing at ground level so the complex reads cleanly,
+      // building as you climb and thinning above the weather. Scenery only.
       const deck =
         climbed < 0.09 ? 0 : Math.max(0, Math.min(1, 1 - Math.abs(climbed - 0.26) / 0.19));
       this.cloudTint.set(band.color).lerp(WHITE, 0.72);

@@ -54,13 +54,7 @@ function biasedSpread(sample: number): number {
 }
 
 /** Dry mass, and the mass the boosters add while they are still attached. */
-/**
- * How long the opening camera move onto the pad takes.
- *
- * A framing value only. It used to be a stage of its own that locked ignition
- * out for ten seconds, which meant a run opened on a slow drift over open
- * country rather than on a rocket standing on a launch pad.
- */
+/** Opening camera move onto the pad. Framing only; it gates nothing. */
 const PRELAUNCH_SECONDS = 3.5;
 
 /**
@@ -155,10 +149,7 @@ export class FlightRun {
    * Staging sheds the booster mass, which makes the vehicle leap.
    */
   private stepLaunch(dt: number, input: FlightInput): void {
-    // The camera eases onto the pad over the opening beat. It runs alongside
-    // whatever the player is doing rather than in front of it: Space works on
-    // the first frame, and pressing it mid-move simply ignites under a camera
-    // that is still settling.
+    // Runs alongside the player, not in front: Space works on frame one.
     this.prelaunch = Math.min(1, this.prelaunch + dt / PRELAUNCH_SECONDS);
 
     if (this.stage === 'pad') {
@@ -189,9 +180,7 @@ export class FlightRun {
     }
 
     if (this.stage === 'boost') {
-      // Deliberately sluggish for the first stretch so the complex stays in
-      // frame and shrinks beneath you, easing up only once it is well clear
-      // of the tower.
+      // Sluggish at first so the complex stays in frame and shrinks beneath you.
       const climbRate = 34 + Math.min(1, this.altitude / 700) * 230;
       this.altitude += Math.max(0, this.twr - 1) * dt * climbRate;
       // Staging is the player's call, but a burnt-out booster is dead weight.
@@ -239,17 +228,11 @@ export class FlightRun {
       this.stepLaunch(dt, input);
     }
 
-    // The corridor clock starts at ignition, not when the sequence loads. It
-    // used to run through the pre-launch hold, so a player who took a moment
-    // on the pad — which the sequence explicitly invites, since it waits for a
-    // keypress — burned the entire ascent standing still and then scored as
-    // having completed it.
+    // The corridor clock starts at ignition, so waiting on the pad is free.
     if (this.stage !== 'pad') this.elapsed += dt;
     const cinematic = this.stage === 'pad' || this.stage === 'ignition';
     this.cinematic = cinematic;
-    // Zero until the engines are actually lit. Reporting a full liftoff while
-    // the stack was still clamped down brought the engine roar up to power
-    // before anyone had told it to go.
+    // Zero until the engines are lit; the roar keys off this.
     this.liftoff = this.stage === 'pad' ? 0 : this.stage === 'ignition' ? this.throttle : 1;
 
     if (cinematic) {
